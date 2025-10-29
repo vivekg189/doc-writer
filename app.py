@@ -4,8 +4,11 @@ from flask_cors import CORS
 from string import Template
 import os
 import spacy
+from dotenv import load_dotenv
 from app.services.processor import LegalDocumentProcessor
 import tempfile
+
+load_dotenv()
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'your-secret-key-here'  # Change this in production

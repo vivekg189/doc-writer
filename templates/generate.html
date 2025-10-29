@@ -38,7 +38,7 @@
                                 <!-- Language Selection -->
                                 <div class="col-md-6">
                                     <label for="language" class="form-label">Select Language</label>
-                                    <select id="language" name="language" class="form-select form-control-lg">
+                                    <select id="language" name="language" class="form-select form-control-lg" onchange="document.getElementById('hidden_language').value = this.value">
                                         <option value="en">English</option>
                                         <option value="hi">Hindi</option>
                                         <option value="bn">Bengali</option>
@@ -69,7 +69,9 @@
                         </div>
                     </div>
 
-                    <form id="documentForm" action="{{ url_for('document.generate', doc_type=doc_type) }}" method="POST" class="card p-4 bounce-in" onsubmit="return validateForm(event)">
+                    <form id="documentForm" action="/generate" method="POST" class="card p-4 bounce-in" onsubmit="return validateForm(event)">
+                        <input type="hidden" name="doc_type" value="{{ doc_type }}">
+                        <input type="hidden" name="language" value="en" id="hidden_language">
                         {% if doc_type == 'house_lease' %}
                             <!-- House Lease Agreement Fields -->
                             <div class="row g-3">

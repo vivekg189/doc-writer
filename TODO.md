@@ -1,15 +1,5 @@
-# TODO: Implement User Authentication UI Changes
+# TODO for Making validate.py Executable
 
-## Completed Steps
-- [x] Modified app/routes/auth_routes.py to store user data in session after login
-- [x] Updated logout to clear all session data
-- [x] Added get_user_from_session function in app/models/users.py
-- [x] Updated app/routes/main_routes.py to use session-stored user data
-- [x] Updated language options to full names (English, Telugu, etc.)
-- [x] Enhanced UI with icons and better styling
-- [x] Added translation functionality for non-English languages
-
-## Next Steps
-- Test the login flow to ensure username displays correctly after login
-- Verify logout clears the session and shows login/signup again
-- Test the translation feature for document generation
+- [x] Add sample document texts for each type (rental_agreement, land_sale_deed, power_of_attorney) in the main block
+- [x] Implement main block that calls validate_document for each sample and prints the results
+- [x] Test the script execution to ensure output is produced

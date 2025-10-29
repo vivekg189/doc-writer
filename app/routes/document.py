@@ -322,6 +322,7 @@ def document_form(doc_type):
 
 @document_bp.route('/generate', methods=['POST'])
 def generate_document():
+    print("DEBUG: generate_document route called")
     doc_type = request.form.get('doc_type')
     language = request.form.get('language', 'en')
     if not doc_type or doc_type not in documents:
@@ -334,18 +335,18 @@ def generate_document():
     # Map form fields to template placeholders
     field_mapping = {
         'rental_agreement': {
-            'owner_name': 'owner_name',
-            'owner_age': 'owner_age',
-            'owner_father': 'owner_father',
-            'owner_address': 'owner_address',
-            'owner_city': 'owner_city',
-            'owner_pincode': 'owner_pincode',
-            'renter_name': 'renter_name',
-            'renter_age': 'renter_age',
-            'renter_father': 'renter_father',
-            'renter_address': 'renter_address',
-            'renter_city': 'renter_city',
-            'renter_pincode': 'renter_pincode',
+            'owner_name': 'landlord',
+            'owner_age': 'landlord_age',
+            'owner_father': 'landlord_father',
+            'owner_address': 'landlord_address',
+            'owner_city': 'landlord_city',
+            'owner_pincode': 'landlord_pincode',
+            'renter_name': 'tenant',
+            'renter_age': 'tenant_age',
+            'renter_father': 'tenant_father',
+            'renter_address': 'tenant_address',
+            'renter_city': 'tenant_city',
+            'renter_pincode': 'tenant_pincode',
             'property_address': 'property_address',
             'property_city': 'property_city',
             'property_pincode': 'property_pincode',
@@ -509,8 +510,16 @@ def generate_document():
         entities = [(ent.text, ent.label_) for ent in doc_nlp.ents]
 
         # Log history
+        print(f"DEBUG: Session contents: {dict(session)}")
         if 'user_id' in session:
-            add_user_history(session['user_id'], 'generate_document', f'Generated {doc_type}')
+            print(f"DEBUG: Found user_id in session: {session['user_id']}")
+            result = add_user_history(session['user_id'], 'generate_document', f'Generated {doc_type}')
+            print(f"DEBUG: History add result: {result}")
+        else:
+            print("DEBUG: No user_id found in session - user not logged in")
+            # Test with a dummy UUID to see if the function works at all
+            test_result = add_user_history('550e8400-e29b-41d4-a716-446655440000', 'test_action', 'Test entry')
+            print(f"DEBUG: Test history result: {test_result}")
 
         return render_template('view_document.html', doc_type=doc_type, content=document, entities=entities)
     except Exception as e:
@@ -626,6 +635,14 @@ def api_generate_document():
             complete_data = get_default_data_for_document(doc_type, language)
             complete_data.update(filled_data)  # User data overrides defaults
             document_content = processor.generate_document(doc_type, complete_data, language=language)
+        
+        # Log history
+        print(f"DEBUG API: Session contents: {dict(session)}")
+        if 'user_id' in session:
+            print(f"DEBUG API: Found user_id in session: {session['user_id']}")
+            add_user_history(session['user_id'], 'generate_document', f'Generated {doc_type} ({format_type})')
+        else:
+            print("DEBUG API: No user_id found in session - user not logged in")
         
         # Create file based on format
         if format_type == 'docx':

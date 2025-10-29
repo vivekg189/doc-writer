@@ -12,26 +12,31 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def add_user_history(user_id, action, details=None):
     try:
-        # Convert user_id to integer if it's a string
-        if isinstance(user_id, str):
-            try:
-                user_id = int(user_id)
-            except ValueError:
-                print(f"Invalid user_id format: {user_id}")
-                return None
-
+        print(f"DEBUG: Attempting to add history - user_id: {user_id}, action: {action}, details: {details}")
+        
+        # Use UUID string directly - don't convert to integer
         data = {
             'user_id': user_id,
             'action': action,
             'details': details,
             'timestamp': datetime.utcnow().isoformat()
         }
+        print(f"DEBUG: Data to insert: {data}")
+        
         response = supabase.table('user_history').insert(data).execute()
+        print(f"DEBUG: Insert response: {response}")
         return response.data
     except Exception as e:
-        print(f"Supabase connection error in add_user_history: {e}")
+        print(f"ERROR in add_user_history: {e}")
+        import traceback
+        print(f"Full traceback: {traceback.format_exc()}")
         return None
 
 def get_user_history(user_id, limit=50):
-    response = supabase.table('user_history').select('*').eq('user_id', user_id).order('timestamp', desc=True).limit(limit).execute()
-    return response.data
+    try:
+        # Use UUID string directly - don't convert to integer
+        response = supabase.table('user_history').select('*').eq('user_id', user_id).order('timestamp', desc=True).limit(limit).execute()
+        return response.data
+    except Exception as e:
+        print(f"Supabase connection error in get_user_history: {e}")
+        return []

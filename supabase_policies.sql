@@ -1,29 +1,22 @@
 -- Enable RLS on tables
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_history ENABLE ROW LEVEL SECURITY;
 
--- Users table policies
--- Allow inserts for user registration (signup)
-CREATE POLICY "Allow user registration" ON users
-FOR INSERT
-TO anon
-WITH CHECK (true);
-
--- Allow users to read their own data (for login verification)
-CREATE POLICY "Allow user login verification" ON users
-FOR SELECT
-TO anon
-USING (true);
-
 -- User history table policies
--- Allow inserts for logging user activities
-CREATE POLICY "Allow activity logging" ON user_history
+-- Allow authenticated users to insert their own history
+CREATE POLICY "Users can insert own history" ON user_history
 FOR INSERT
-TO anon
-WITH CHECK (true);
+TO authenticated
+WITH CHECK (auth.uid() = user_id);
 
--- Allow users to read their own history
-CREATE POLICY "Allow history viewing" ON user_history
+-- Allow authenticated users to read their own history
+CREATE POLICY "Users can view own history" ON user_history
 FOR SELECT
-TO anon
-USING (true);
+TO authenticated
+USING (auth.uid() = user_id);
+
+-- Allow service role to insert/read all history (for server-side operations)
+CREATE POLICY "Service role can manage history" ON user_history
+FOR ALL
+TO service_role
+USING (true)
+WITH CHECK (true);

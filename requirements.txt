@@ -7,9 +7,14 @@ spacy
 # Document Generation
 python-docx
 reportlab
+python-dateutil
 # For environment variables
 python-dotenv
 # Supabase client
 supabase
 # User authentication
 Flask-Login
+# Google OAuth
+google-auth
+google-auth-oauthlib
+google-auth-httplib2

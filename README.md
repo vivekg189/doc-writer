@@ -110,11 +110,20 @@ legal-doc-generator/
 
 2. **Install Python dependencies**
    ```bash
-   cd backend
    pip install -r requirements.txt
    ```
 
-3. **Install spaCy language model**
+3. **Set up Supabase Database**
+   - Create a Supabase account and project
+   - Follow the detailed guide in `DATABASE_SETUP.md`
+   - Run the SQL scripts in your Supabase SQL Editor
+   - Update your `.env` file with Supabase credentials
+
+4. **Set up Google OAuth (Optional)**
+   - Follow the detailed guide in `GOOGLE_OAUTH_SETUP.md`
+   - Add your Google Client ID to the `.env` file
+
+5. **Install spaCy language model**
    ```bash
    python -m spacy download en_core_web_sm
 
@@ -122,12 +131,12 @@ legal-doc-generator/
    python -m spacy download xx_ent_wiki_sm
    ```
 
-4. **Run the application**
+6. **Run the application**
    ```bash
    python app.py
    ```
 
-5. **Access the application**
+7. **Access the application**
    Open your browser and go to: `http://localhost:5000`
 
 ## 📋 Supported Document Types & Languages

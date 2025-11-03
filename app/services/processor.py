@@ -38,7 +38,7 @@ class LegalDocumentProcessor:
             },
             'house_lease': {
                 'keywords': ['house', 'lease', 'lessor', 'lessee', 'property'],
-                'required_fields': ['lessor', 'lessor_address', 'lessee', 'lessee_address', 'property_address', 'lease_amount', 'start_date', 'duration'],
+                'required_fields': ['lessor', 'lessor_age', 'lessor_father', 'lessor_address', 'lessor_city', 'lessor_pincode', 'lessee', 'lessee_age', 'lessee_father', 'lessee_address', 'lessee_city', 'lessee_pincode', 'property_address', 'property_city', 'property_pincode', 'lease_period', 'start_date', 'end_date', 'lease_amount', 'lease_amount_words', 'rent_due_date', 'security_deposit', 'security_deposit_words', 'notice_period', 'number_of_rooms'],
                 'template': 'house_lease_template.txt'
             }
         }

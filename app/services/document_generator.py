@@ -3,6 +3,7 @@ import os
 from typing import Dict, List, Optional
 from jinja2 import Template, Environment
 from jinja2.loaders import FileSystemLoader
+from app.utils.template_validator import validate_template_data, fill_missing_variables
 
 class DocumentGenerator:
     def __init__(self):
@@ -24,11 +25,31 @@ class DocumentGenerator:
         """Get the required fields for a document type."""
         fields = {
             'house_lease': {
-                'landlord_name': 'Landlord\'s Name',
-                'tenant_name': 'Tenant\'s Name',
+                'lessor': 'Lessor\'s Name',
+                'lessor_age': 'Lessor\'s Age',
+                'lessor_father': 'Lessor\'s Father Name',
+                'lessor_address': 'Lessor\'s Address',
+                'lessor_city': 'Lessor\'s City',
+                'lessor_pincode': 'Lessor\'s Pincode',
+                'lessee': 'Lessee\'s Name',
+                'lessee_age': 'Lessee\'s Age',
+                'lessee_father': 'Lessee\'s Father Name',
+                'lessee_address': 'Lessee\'s Address',
+                'lessee_city': 'Lessee\'s City',
+                'lessee_pincode': 'Lessee\'s Pincode',
                 'property_address': 'Property Address',
-                'rent_amount': 'Monthly Rent Amount',
-                'lease_term': 'Lease Term (months)'
+                'property_city': 'Property City',
+                'property_pincode': 'Property Pincode',
+                'lease_period': 'Lease Period (years)',
+                'start_date': 'Start Date',
+                'end_date': 'End Date',
+                'lease_amount': 'Monthly Lease Amount',
+                'lease_amount_words': 'Lease Amount in Words',
+                'rent_due_date': 'Rent Due Date',
+                'security_deposit': 'Security Deposit',
+                'security_deposit_words': 'Security Deposit in Words',
+                'notice_period': 'Notice Period (months)',
+                'number_of_rooms': 'Number of Rooms'
             },
             'power_of_attorney': {
                 'grantor_name': 'Grantor\'s Name',
@@ -123,6 +144,28 @@ class DocumentGenerator:
         current_date = datetime.now().strftime("%B %d, %Y")
         data_with_date = data.copy()
         data_with_date['date'] = current_date
+        
+        # Validate template and fill missing variables
+        try:
+            # Read template content for validation
+            template_file_name = 'house_lease_template.txt'
+            if language != 'en':
+                template_path = os.path.join(self.base_template_dir, language, template_file_name)
+            else:
+                template_path = os.path.join(self.base_template_dir, template_file_name)
+            
+            if os.path.exists(template_path):
+                with open(template_path, 'r', encoding='utf-8') as f:
+                    template_content = f.read()
+                
+                validation_result = validate_template_data(template_content, data_with_date)
+                
+                if not validation_result['is_valid']:
+                    print(f"Missing template variables: {validation_result['missing_variables']}")
+                    data_with_date = fill_missing_variables(data_with_date, validation_result['missing_variables'], 'house_lease')
+        except Exception as e:
+            print(f"Template validation error: {e}")
+            # Continue with original data if validation fails
         
         document = template.render(**data_with_date)
         

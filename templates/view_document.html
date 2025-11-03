@@ -37,28 +37,28 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center no-print">
                         <h4 class="mb-0">{{ doc_type|title|replace('_', ' ') }}</h4>
-                        <div class="d-flex flex-wrap align-items-center gap-2">
-                            <a href="{{ url_for('document.document_form', doc_type=doc_type) }}" class="btn btn-outline-primary btn-icon flex-grow-1 flex-md-grow-0">
-                                <i class="fas fa-edit me-2"></i>Edit Form
-                            </a>
-                            <button id="editDocumentBtn" class="btn btn-secondary btn-icon flex-grow-1 flex-md-grow-0">
-                                <i class="fas fa-pencil-alt me-2"></i>Edit Document (Inline)
-                            </button>
-                            <button id="saveChangesBtn" class="btn btn-success btn-icon flex-grow-1 flex-md-grow-0" style="display:none;">
-                                <i class="fas fa-save me-2"></i>Save Changes
-                            </button>
-                            <button onclick="window.print()" class="btn btn-info btn-icon flex-grow-1 flex-md-grow-0">
-                                <i class="fas fa-print me-2"></i>Print
-                            </button>
-                            <div class="dropdown d-inline-block flex-grow-1 flex-md-grow-0">
-                                <button class="btn btn-warning btn-icon dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-download me-2"></i>Download
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="btn-group me-3" role="group">
+                                <a href="{{ url_for('document.document_form', doc_type=doc_type) }}" class="btn btn-outline-primary rounded-pill">
+                                    <i class="fas fa-edit me-2"></i>Edit Form
+                                </a>
+                                <button id="editDocumentBtn" class="btn btn-secondary rounded-pill">
+                                    <i class="fas fa-pencil-alt me-2"></i>Edit Document
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="downloadDropdown">
-                                    <li><a class="dropdown-item" href="#" onclick="downloadAsText()"><i class="far fa-file-alt me-2"></i>TXT</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="downloadAsDocx()"><i class="far fa-file-word me-2"></i>DOCX</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="downloadAsPdf()"><i class="far fa-file-pdf me-2"></i>PDF</a></li>
-                                </ul>
+                                <button id="saveChangesBtn" class="btn btn-success rounded-pill" style="display:none;">
+                                    <i class="fas fa-save me-2"></i>Save Changes
+                                </button>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button onclick="downloadAsText()" class="btn btn-warning rounded-pill">
+                                    <i class="far fa-file-alt me-1"></i>TXT
+                                </button>
+                                <button onclick="downloadAsDocx()" class="btn btn-success rounded-pill">
+                                    <i class="far fa-file-word me-1"></i>DOCX
+                                </button>
+                                <button onclick="downloadAsPdf()" class="btn btn-danger rounded-pill">
+                                    <i class="far fa-file-pdf me-1"></i>PDF
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -92,17 +92,80 @@
 
     function downloadAsDocx() {
         const content = document.getElementById('documentText').innerText;
-        const blob = new Blob([content], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = '{{ doc_type }}.docx';
-        a.click();
-        window.URL.revokeObjectURL(url);
+        const docType = '{{ doc_type }}';
+        
+        // Create form data for API call
+        const formData = {
+            document_type: docType,
+            filled_data: { content: content },
+            format: 'docx'
+        };
+        
+        // Call backend API to generate DOCX
+        fetch('/api/generate-document', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            }
+            throw new Error('Failed to generate DOCX');
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = docType + '_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.docx';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            console.error('Error downloading DOCX:', error);
+            alert('Failed to download DOCX. Please try again.');
+        });
     }
 
     function downloadAsPdf() {
-        window.print();
+        const content = document.getElementById('documentText').innerText;
+        const docType = '{{ doc_type }}';
+        
+        // Create form data for API call
+        const formData = {
+            document_type: docType,
+            filled_data: { content: content },
+            format: 'pdf'
+        };
+        
+        // Call backend API to generate PDF
+        fetch('/api/generate-document', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            }
+            throw new Error('Failed to generate PDF');
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = docType + '_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.pdf';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            console.error('Error downloading PDF:', error);
+            alert('Failed to download PDF. Please try again.');
+        });
     }
 
     // Inline Editing Logic

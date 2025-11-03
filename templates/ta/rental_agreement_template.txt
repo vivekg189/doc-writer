@@ -2,9 +2,9 @@
 
 இந்த ஒப்பந்தம் {{ date }} {{ month }} {{ year }} அன்று, கீழ்க்காணும் இரு தரப்பினருக்கும் இடையே ஏற்படுகிறது:
 
-மாலிகை (வீட்டு உரிமையாளர்): {{ owner_name }} (வயது: {{ owner_age }}), தந்தை: {{ owner_father }}, முகவரி: {{ owner_address }}, {{ owner_city }} - {{ owner_pincode }}
+மாலிகை (வீட்டு உரிமையாளர்): {{ landlord }} (வயது: {{ landlord_age }}), தந்தை: {{ landlord_father }}, முகவரி: {{ landlord_address }}, {{ landlord_city }} - {{ landlord_pincode }}
 
-வாடகையாளர்: {{ renter_name }} (வயது: {{ renter_age }}), தந்தை: {{ renter_father }}, முகவரி: {{ renter_address }}, {{ renter_city }} - {{ renter_pincode }}
+வாடகையாளர்: {{ tenant }} (வயது: {{ tenant_age }}), தந்தை: {{ tenant_father }}, முகவரி: {{ tenant_address }}, {{ tenant_city }} - {{ tenant_pincode }}
 
 வாடகைக்குரிய சொத்து: {{ property_address }}, {{ property_city }} - {{ property_pincode }}
 

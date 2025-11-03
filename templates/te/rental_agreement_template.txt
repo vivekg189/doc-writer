@@ -3,16 +3,16 @@
 ఈ అద్దె ఒప్పందం {{ date }} {{ month }} {{ year }} న క్రింది పక్షాల మధ్య చట్టబద్ధంగా చేయబడింది. ఈ ఒప్పందం ద్వారా అద్దెదారు (లెసర్) మరియు అద్దె తీసుకునేవారు (లీసీ) వారి హక్కులు, బాధ్యతలు మరియు నిబంధనలను నిర్ధారిస్తారు.
 
 అద్దెదారు (యజమాని):
-పేరు: {{ owner_name }}
-వయసు: {{ owner_age }} సంవత్సరాలు
-తండ్రి పేరు: {{ owner_father }}
-చిరునామా: {{ owner_address }}, {{ owner_city }} - {{ owner_pincode }}
+పేరు: {{ landlord }}
+వయసు: {{ landlord_age }} సంవత్సరాలు
+తండ్రి పేరు: {{ landlord_father }}
+చిరునామా: {{ landlord_address }}, {{ landlord_city }} - {{ landlord_pincode }}
 
 అద్దె తీసుకునేవారు (అద్దెదారు):
-పేరు: {{ renter_name }}
-వయసు: {{ renter_age }} సంవత్సరాలు
-తండ్రి పేరు: {{ renter_father }}
-చిరునామా: {{ renter_address }}, {{ renter_city }} - {{ renter_pincode }}
+పేరు: {{ tenant }}
+వయసు: {{ tenant_age }} సంవత్సరాలు
+తండ్రి పేరు: {{ tenant_father }}
+చిరునామా: {{ tenant_address }}, {{ tenant_city }} - {{ tenant_pincode }}
 
 1. ఆస్తి వివరాలు:
    - చిరునామా: {{ property_address }}, {{ property_city }} - {{ property_pincode }}
@@ -22,7 +22,7 @@
    ఈ ఒప్పందం {{ lease_period }} సంవత్సరాల పాటు చెల్లుబాటు అవుతుంది, {{ start_date }} నుండి {{ end_date }} వరకు.
 
 3. అద్దె మరియు చెల్లింపు:
-   - నెలవారీ అద్దె: ₹ {{ lease_amount }} (పదాలలో: {{ lease_amount_words }})
+   - నెలవారీ అద్దె: ₹ {{ rent_amount }} (పదాలలో: {{ rent_amount_words }})
    - అద్దె ప్రతి నెల {{ rent_due_date }} తేదీకి చెల్లించాలి.
    - భద్రత డిపాజిట్: ₹ {{ security_deposit }} (పదాలలో: {{ security_deposit_words }})
    - భద్రత డిపాజిట్ ఒప్పందం ముగిసిన తర్వాత తిరిగి ఇవ్వబడుతుంది.

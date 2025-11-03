@@ -2,7 +2,7 @@
 from flask import render_template, request, flash, session, jsonify
 from . import document_bp
 from app.services.processor import LegalDocumentProcessor
-from app.models.history import add_user_history
+from app.models.history import add_user_history, save_generated_document
 import spacy
 import json
 import tempfile
@@ -13,6 +13,11 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_JUSTIFY
 from reportlab.lib.units import inch
 from datetime import datetime
+try:
+    from dateutil.relativedelta import relativedelta
+except ImportError:
+    # Fallback if dateutil is not available
+    relativedelta = None
 import re
 import requests
 
@@ -130,6 +135,40 @@ def get_default_data_for_document(doc_type, language):
             'expiry_date': '31st March 2025'
         })
     elif doc_type == 'house_lease':
+        # Calculate end date based on lease period
+        def calculate_end_date(start_date_str, lease_period_years):
+            try:
+                if relativedelta:
+                    # Handle different date formats
+                    for fmt in ['%dst %B %Y', '%dnd %B %Y', '%drd %B %Y', '%dth %B %Y', '%d %B %Y']:
+                        try:
+                            start_date_obj = datetime.strptime(start_date_str, fmt)
+                            break
+                        except ValueError:
+                            continue
+                    else:
+                        # Fallback to current date
+                        start_date_obj = datetime.now()
+                    
+                    end_date_obj = start_date_obj + relativedelta(years=int(lease_period_years))
+                    day = end_date_obj.day
+                    if day == 1:
+                        suffix = 'st'
+                    elif day == 2:
+                        suffix = 'nd'
+                    elif day == 3:
+                        suffix = 'rd'
+                    else:
+                        suffix = 'th'
+                    return end_date_obj.strftime(f'%d{suffix} %B %Y')
+                else:
+                    # Simple fallback calculation without dateutil
+                    return '31st March 2026'
+            except:
+                return '31st March 2026'
+        
+        end_date_str = calculate_end_date('1st April 2024', '2')
+            
         defaults.update({
             'lessor_age': '50',
             'lessee_age': '35',
@@ -146,7 +185,7 @@ def get_default_data_for_document(doc_type, language):
             'property_pincode': '600073',
             'lease_period': '2',
             'start_date': '1st April 2024',
-            'end_date': '31st March 2026',
+            'end_date': end_date_str,
             'lease_amount': '25,000',
             'lease_amount_words': 'Twenty Five Thousand',
             'rent_due_date': '1st',
@@ -509,17 +548,28 @@ def generate_document():
         doc_nlp = nlp(document)
         entities = [(ent.text, ent.label_) for ent in doc_nlp.ents]
 
-        # Log history
+        # Log history and save document
         print(f"DEBUG: Session contents: {dict(session)}")
         if 'user_id' in session:
             print(f"DEBUG: Found user_id in session: {session['user_id']}")
-            result = add_user_history(session['user_id'], 'generate_document', f'Generated {doc_type}')
+            
+            # Add to history
+            result = add_user_history(session['user_id'], 'generate_document', f'Generated {doc_type} in {language}')
             print(f"DEBUG: History add result: {result}")
+            
+            # Save generated document
+            title = f"{doc_type.replace('_', ' ').title()} - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+            doc_result = save_generated_document(
+                session['user_id'], 
+                doc_type, 
+                language, 
+                title, 
+                document, 
+                data  # Save the form data
+            )
+            print(f"DEBUG: Document save result: {doc_result}")
         else:
             print("DEBUG: No user_id found in session - user not logged in")
-            # Test with a dummy UUID to see if the function works at all
-            test_result = add_user_history('550e8400-e29b-41d4-a716-446655440000', 'test_action', 'Test entry')
-            print(f"DEBUG: Test history result: {test_result}")
 
         return render_template('view_document.html', doc_type=doc_type, content=document, entities=entities)
     except Exception as e:
@@ -558,9 +608,21 @@ def generate_from_prompt():
         doc_nlp = nlp(document)
         extracted_entities = [(ent.text, ent.label_) for ent in doc_nlp.ents]
 
-        # Log history
+        # Log history and save document
         if 'user_id' in session:
-            add_user_history(session['user_id'], 'generate_from_prompt', f'Generated {doc_type} from prompt')
+            # Add to history
+            add_user_history(session['user_id'], 'generate_from_prompt', f'Generated {doc_type} from prompt in {language}')
+            
+            # Save generated document
+            title = f"{doc_type.replace('_', ' ').title()} from Prompt - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+            save_generated_document(
+                session['user_id'], 
+                doc_type, 
+                language, 
+                title, 
+                document, 
+                entities  # Save the extracted entities
+            )
 
         flash(f'Document type classified as: {doc_type.replace("_", " ").title()}', 'success')
         return render_template('view_document.html', doc_type=doc_type, content=document, entities=extracted_entities, prompt=prompt)
@@ -630,17 +692,34 @@ def api_generate_document():
                 document_content = template.render(**filled_data)
             except Exception as e:
                 return jsonify({'error': f'Error rendering custom template: {str(e)}'}), 400
+        elif 'content' in filled_data:
+            # Use provided content directly (for downloads from view_document.html)
+            document_content = filled_data['content']
         else:
             # Merge filled_data with default values for a complete document
             complete_data = get_default_data_for_document(doc_type, language)
             complete_data.update(filled_data)  # User data overrides defaults
             document_content = processor.generate_document(doc_type, complete_data, language=language)
         
-        # Log history
+        # Log history and save document
         print(f"DEBUG API: Session contents: {dict(session)}")
         if 'user_id' in session:
             print(f"DEBUG API: Found user_id in session: {session['user_id']}")
-            add_user_history(session['user_id'], 'generate_document', f'Generated {doc_type} ({format_type})')
+            
+            # Add to history
+            add_user_history(session['user_id'], 'download_document', f'Downloaded {doc_type} as {format_type} in {language}')
+            
+            # Save generated document if not already saved
+            if 'content' not in filled_data:  # Only save if it's a new generation
+                title = f"{doc_type.replace('_', ' ').title()} - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+                save_generated_document(
+                    session['user_id'], 
+                    doc_type, 
+                    language, 
+                    title, 
+                    document_content, 
+                    filled_data
+                )
         else:
             print("DEBUG API: No user_id found in session - user not logged in")
         
@@ -745,3 +824,65 @@ def edit_document():
         return render_template('view_document.html', doc_type=doc_type, content=edited_content, entities=[]) # Simplified entities for now
 
     return render_template('edit_document.html', doc_type=doc_type, content=content)
+
+@document_bp.route('/api/document/<doc_id>/view')
+def api_view_document(doc_id):
+    """View a saved document"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'error': 'Authentication required'}), 401
+        
+        from app.models.history import supabase
+        if not supabase:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        # Get document from database
+        response = supabase.table('generated_documents').select('*').eq('id', doc_id).eq('user_id', session['user_id']).execute()
+        
+        if not response.data:
+            return jsonify({'error': 'Document not found'}), 404
+        
+        document = response.data[0]
+        
+        # Return HTML view of the document
+        return render_template('view_document.html', 
+                             doc_type=document['document_type'], 
+                             content=document['content'], 
+                             entities=[],
+                             title=document['title'])
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@document_bp.route('/api/document/<doc_id>/download/<format>')
+def api_download_document(doc_id, format):
+    """Download a saved document"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'error': 'Authentication required'}), 401
+        
+        from app.models.history import supabase
+        if not supabase:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        # Get document from database
+        response = supabase.table('generated_documents').select('*').eq('id', doc_id).eq('user_id', session['user_id']).execute()
+        
+        if not response.data:
+            return jsonify({'error': 'Document not found'}), 404
+        
+        document = response.data[0]
+        
+        # Log download activity
+        add_user_history(session['user_id'], 'download_saved_document', f'Downloaded saved {document["document_type"]} as {format}')
+        
+        # Create file based on format
+        if format == 'docx':
+            return create_docx_file(document['content'], document['document_type'])
+        elif format == 'pdf':
+            return create_pdf_file(document['content'], document['document_type'])
+        else:
+            return jsonify({'error': 'Unsupported format'}), 400
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

@@ -1,0 +1,24 @@
+# Telugu House Lease Template - Translation Pending
+
+ఇది తెలుగు భాషలో గృహ అద్దె ఒప్పందం టెంప్లేట్. దయచేసి దీన్ని అనువదించండి.
+
+{{ date }} {{ month }} {{ year }} న ఈ ఒప్పందం క్రింది పక్షాల మధ్య చేయబడింది:
+
+అద్దెదారు (Lessor): {{ lessor }} (వయసు: {{ lessor_age }}), తండ్రి పేరు: {{ lessor_father }}, చిరునామా: {{ lessor_address }}, {{ lessor_city }} - {{ lessor_pincode }}
+
+అద్దె తీసుకునేవారు (Lessee): {{ lessee }} (వయసు: {{ lessee_age }}), తండ్రి పేరు: {{ lessee_father }}, చిరునామా: {{ lessee_address }}, {{ lessee_city }} - {{ lessee_pincode }}
+
+ఆస్తి చిరునామా: {{ property_address }}, {{ property_city }} - {{ property_pincode }}
+
+1) అద్దె కాలం: {{ lease_period }} సంవత్సరాలు ({{ start_date }} నుండి {{ end_date }} వరకు)
+2) నెలవారీ అద్దె: ₹ {{ lease_amount }} (పదాలలో: {{ lease_amount_words }}) — ప్రతి నెల {{ rent_due_date }} తేదీకి చెల్లించాలి
+3) భద్రత డిపాజిట్: ₹ {{ security_deposit }} (పదాలలో: {{ security_deposit_words }})
+4) నోటీసు కాలం: {{ notice_period }} నెలలు
+5) గదుల సంఖ్య: {{ number_of_rooms }}
+
+ఈ ఒప్పందానికి సంబంధించిన అన్ని చట్టపరమైన నిబంధనలు వర్తిస్తాయి.
+
+సాక్షి 1: {{ witness1_name }}, {{ witness1_address }}
+సాక్షి 2: {{ witness2_name }}, {{ witness2_address }}
+
+{{ execution_place }} వద్ద, {{ execution_date }} న సంతకం చేయబడింది.

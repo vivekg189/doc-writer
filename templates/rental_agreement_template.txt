@@ -1,0 +1,61 @@
+HOUSE RENTAL AGREEMENT
+
+This deed of rental agreement executed on this {{date}} Day of {{month}}, {{year}}
+
+BETWEEN
+
+Mr. {{landlord}}, aged about {{landlord_age}} Years, Resident of No. {{landlord_address}}, {{landlord_city}} - {{landlord_pincode}} Hereinafter called the 'Landlord' of the one part
+
+AND
+
+Mr. {{tenant}}, S/o {{tenant_father}}, aged about {{tenant_age}} Years, Resident of No. {{tenant_address}}, {{tenant_city}} - {{tenant_pincode}}, hereinafter called the "Tenant" of the other part
+
+WITNESSETH:
+
+Whereas the Landlord is the absolute owner of the Residential Building at No. {{property_address}}, {{property_city}} - {{property_pincode}}.
+
+And whereas the Tenant approached the Landlord to let him the said premises for residential purposes, under the following terms and conditions and the Landlord having consented to let it.
+
+Now this deed of rental agreement witness:
+
+1. The tenancy is according to English Calendar commencing from {{start_date}} and it is effective from {{effective_date}}.
+
+2. The period of this agreement is for {{duration}} months and is renewable for a further period of {{renewal_period}} months by mutual consent of the parties.
+
+3. The tenancy is purely for residential purposes and the tenant shall not use it for any other purposes.
+
+4. The monthly rent payable for the premises is Rs.{{rent_amount}}/- (Rupees {{rent_amount_words}} only) and which amount is payable on or before the {{rent_due_date}} of every month. If the tenant continues in the same premises after {{duration}} months the existing rent will be increased by {{rent_increase_percentage}}%.
+
+5. The tenant has paid to the Landlord on a premium Advance of Rs.{{security_deposit}}/- (Rupees {{security_deposit_words}} only) which is refundable to the tenant at the time of vacating the premises after deducting any outstanding dues.
+
+6. The tenant shall pay the electricity, water, and other utility charges directly to the concerned authorities.
+
+7. The tenant shall maintain the premises in good condition and shall not make any structural alterations without the written consent of the Landlord.
+
+8. The tenant shall not sublet or assign the premises to any third party without the written consent of the Landlord.
+
+9. The Landlord shall be responsible for major repairs and maintenance of the building structure.
+
+10. Either party can terminate this agreement by giving {{notice_period}} months' written notice to the other party.
+
+11. In case of any dispute arising out of this agreement, the same shall be subject to the jurisdiction of the courts in {{jurisdiction}}.
+
+IN WITNESS WHEREOF, the parties hereto have signed this agreement on the day, month, and year first above written.
+
+SIGNED AND DELIVERED by the said Landlord
+Mr. {{landlord}}
+(Landlord)
+
+SIGNED AND DELIVERED by the said Tenant
+Mr. {{tenant}}
+(Tenant)
+
+WITNESSES:
+1. {{witness1_name}}
+   Address: {{witness1_address}}
+
+2. {{witness2_name}}
+   Address: {{witness2_address}}
+
+Date: {{execution_date}}
+Place: {{execution_place}}

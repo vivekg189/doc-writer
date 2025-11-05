@@ -1,0 +1,23 @@
+வீட்டு குத்தகை ஒப்பந்தம்
+
+இந்த ஒப்பந்தம் {{ date }} {{ month }} {{ year }} அன்று, கீழ்க்காணும் தரப்பினருக்கிடையில் செய்யப்பட்டதாகும்:
+
+குத்தகையாளர் (Lessor): {{ lessor }} (வயது: {{ lessor_age }}), தந்தை: {{ lessor_father }}, முகவரி: {{ lessor_address }}, {{ lessor_city }} - {{ lessor_pincode }}
+
+குத்தகை பெறுபவர் (Lessee): {{ lessee }} (வயது: {{ lessee_age }}), தந்தை: {{ lessee_father }}, முகவரி: {{ lessee_address }}, {{ lessee_city }} - {{ lessee_pincode }}
+
+சொத்து முகவரி: {{ property_address }}, {{ property_city }} - {{ property_pincode }}
+
+1) குத்தகைக் காலம்: {{ lease_period }} ஆண்டுகள் ({{ start_date }} முதல் {{ end_date }} வரை)
+2) மாதாந்திர குத்தகை: ₹ {{ lease_amount }} (எழுத்தில்: {{ lease_amount_words }}) — ஒவ்வொரு மாதமும் {{ rent_due_date }} தேதிக்குள் செலுத்த வேண்டும்
+3) முன்பணம் (டெபாசிட்): ₹ {{ security_deposit }} (எழுத்தில்: {{ security_deposit_words }})
+4) முன் அறிவிப்பு காலம்: {{ notice_period }} மாதங்கள்
+5) அறைகளின் எண்ணிக்கை: {{ number_of_rooms }}
+
+சட்டப்படி பொருந்தும் விதிமுறைகள் அனைத்தும் இவ்வொப்பந்தத்திற்குப் பொருந்தும்.
+
+சாட்சி 1: {{ witness1_name }}, {{ witness1_address }}
+சாட்சி 2: {{ witness2_name }}, {{ witness2_address }}
+
+{{ execution_place }} இல், {{ execution_date }} அன்று கையெழுத்திடப்பட்டது.
+

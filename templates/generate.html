@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate {{ doc_type|replace('_', ' ')|title }} - Legal Document Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="d-flex flex-column min-vh-100">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary no-print">
+            <div class="container">
+                <a class="navbar-brand" href="{{ url_for('main.index') }}">Legal Document Generator</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- No authentication, so no nav links needed -->
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="container flex-grow-1 my-5 fade-in">
+            <div class="row justify-content-center">
+                <div class="col-md-9">
+                    <h1 class="mb-4 text-center">Generate {{ doc_type|replace('_', ' ')|title }}</h1>
+
+                    <div class="card mb-4 slide-up">
+                        <div class="card-header">
+                            <h2 class="mb-0">Template Options</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <!-- Language Selection -->
+                                <div class="col-md-6">
+                                    <label for="language" class="form-label">Select Language</label>
+                                    <select id="language" name="language" class="form-select form-control-lg" onchange="document.getElementById('hidden_language').value = this.value">
+                                        <option value="en">English</option>
+                                        <option value="hi">Hindi</option>
+                                        <option value="bn">Bengali</option>
+                                        <option value="te">Telugu</option>
+                                        <option value="mr">Marathi</option>
+                                        <option value="ur">Urdu</option>
+                                        <option value="gu">Gujarati</option>
+                                        <option value="kn">Kannada</option>
+                                        <option value="or">Odia</option>
+                                        <option value="ta">Tamil</option>
+                                    </select>
+                                </div>
+
+                                <!-- Custom Template Upload -->
+                                <div class="col-md-6">
+                                    <label for="custom_template" class="form-label">Custom Template (Optional)</label>
+                                    <div class="input-group">
+                                        <select id="custom_template" class="form-select form-control-lg">
+                                            <option value="">Use Default Template</option>
+                                        </select>
+                                        <button type="button" onclick="document.getElementById('template_upload').click()" class="btn btn-outline-secondary">
+                                            <i class="fas fa-upload me-2"></i>Upload New
+                                        </button>
+                                    </div>
+                                    <input type="file" id="template_upload" accept=".txt" class="form-control d-none" onchange="uploadTemplate(this)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="documentForm" action="/generate" method="POST" class="card p-4 bounce-in" onsubmit="return validateForm(event)">
+                        <input type="hidden" name="doc_type" value="{{ doc_type }}">
+                        <input type="hidden" name="language" value="en" id="hidden_language">
+                        {% if doc_type == 'house_lease' %}
+                            <!-- House Lease Agreement Fields -->
+                            <div class="row g-3">
+                                <div class="col-md-6 form-group">
+                                    <label for="landlord_name" class="form-label">Landlord's Name</label>
+                                    <input type="text" name="landlord_name" id="landlord_name" class="form-control form-control-lg">
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label for="tenant_name" class="form-label">Tenant's Name</label>
+                                    <input type="text" name="tenant_name" id="tenant_name" class="form-control form-control-lg">
+                                </div>
+                                <div class="col-12 form-group">
+                                    <label for="property_address" class="form-label">Property Address</label>
+                                    <textarea name="property_address" id="property_address" rows="3" class="form-control form-control-lg"></textarea>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label for="rent_amount" class="form-label">Monthly Rent Amount</label>
+                                    <input type="number" name="rent_amount" id="rent_amount" class="form-control form-control-lg">
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label for="lease_term" class="form-label">Lease Term (months)</label>
+                                    <input type="number" name="lease_term" id="lease_term" class="form-control form-control-lg">
+                                </div>
+                            </div>
+                        {% elif doc_type == 'power_of_attorney' %}
+                            <!-- Power of Attorney Fields -->
+                            <div class="row g-3">
+                                <div class="col-md-6 form-group">
+                                    <label for="grantor_name" class="form-label">Grantor's Name</label>
+                                    <input type="text" name="grantor_name" id="grantor_name" class="form-control form-control-lg">
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label for="attorney_name" class="form-label">Attorney's Name</label>
+                                    <input type="text" name="attorney_name" id="attorney_name" class="form-control form-control-lg">
+                                </div>
+                                <div class="col-12 form-group">
+                                    <label for="powers" class="form-label">Powers Granted</label>
+                                    <textarea name="powers" id="powers" rows="4" class="form-control form-control-lg"></textarea>
+                                </div>
+                            </div>
+                        {% elif doc_type == 'land_sale_deed' %}
+                            <!-- Land Sale Deed Fields -->
+                            <div class="row g-3">
+                                <div class="col-md-6 form-group">
+                                    <label for="seller_name" class="form-label">Seller's Name</label>
+                                    <input type="text" name="seller_name" id="seller_name" class="form-control form-control-lg">
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label for="buyer_name" class="form-label">Buyer's Name</label>
+                                    <input type="text" name="buyer_name" id="buyer_name" class="form-control form-control-lg">
+                                </div>
+                                <div class="col-12 form-group">
+                                    <label for="property_description" class="form-label">Property Description</label>
+                                    <textarea name="property_description" id="property_description" rows="4" class="form-control form-control-lg"></textarea>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label for="sale_amount" class="form-label">Sale Amount</label>
+                                    <input type="number" name="sale_amount" id="sale_amount" class="form-control form-control-lg">
+                                </div>
+                            </div>
+                        {% elif doc_type == 'rental_agreement' %}
+                            <!-- Rental Agreement Fields -->
+                            <div class="row g-3">
+                                <div class="col-md-6 form-group">
+                                    <label for="owner_name" class="form-label">Owner's Name</label>
+                                    <input type="text" name="owner_name" id="owner_name" class="form-control form-control-lg">
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label for="renter_name" class="form-label">Renter's Name</label>
+                                    <input type="text" name="renter_name" id="renter_name" class="form-control form-control-lg">
+                                </div>
+                                <div class="col-12 form-group">
+                                    <label for="property_details" class="form-label">Property Details</label>
+                                    <textarea name="property_details" id="property_details" rows="3" class="form-control form-control-lg"></textarea>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label for="rental_amount" class="form-label">Monthly Rental Amount</label>
+                                    <input type="number" name="rental_amount" id="rental_amount" class="form-control form-control-lg">
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label for="agreement_duration" class="form-label">Agreement Duration (months)</label>
+                                    <input type="number" name="agreement_duration" id="agreement_duration" class="form-control form-control-lg">
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-file-alt me-2"></i>Generate Document
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer mt-auto py-3 bg-light no-print">
+            <div class="container text-center">
+                <p class="text-muted mb-0">
+                    © 2025 Legal Document Generator. All rights reserved.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // JavaScript for handling custom template upload and validation
+        function uploadTemplate(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // For now, we'll just log the content or use it as needed
+                    console.log("Custom template content:", e.target.result);
+                    alert("Custom template uploaded successfully! (Content logged to console)");
+                    // In a real application, you might send this to the server via Fetch API
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function validateForm(event) {
+            // Client-side validation is optional since all fields are optional.
+            // If specific fields were to be made required, validation logic would go here.
+            return true; // Allow form submission
+        }
+
+        // Example of dynamically loading custom templates if they were available from the server
+        // fetch('/api/custom_templates')
+        //     .then(response => response.json())
+        //     .then(templates => {
+        //         const select = document.getElementById('custom_template');
+        //         templates.forEach(template => {
+        //             const option = document.createElement('option');
+        //             option.value = template.filename;
+        //             option.textContent = template.display_name;
+        //             select.appendChild(option);
+        //         });
+        //     })
+        //     .catch(error => console.error('Error loading custom templates:', error));
+    </script>
+</body>
+</html>

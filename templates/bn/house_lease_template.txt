@@ -1,0 +1,24 @@
+# Bengali House Lease Template - Translation Pending
+
+এই একটি বাংলা ভাষায় বাড়ি ভাড়ার চুক্তিপত্রের টেমপ্লেট। অনুগ্রহ করে এটি অনুবাদ করুন।
+
+{{ date }} {{ month }} {{ year }} তারিখে নিম্নলিখিত পক্ষদের মধ্যে এই চুক্তি সম্পাদিত হয়েছে:
+
+ভাড়াটিয়া (Lessor): {{ lessor }} (বয়স: {{ lessor_age }}), পিতার নাম: {{ lessor_father }}, ঠিকানা: {{ lessor_address }}, {{ lessor_city }} - {{ lessor_pincode }}
+
+ভাড়াটিয়া (Lessee): {{ lessee }} (বয়স: {{ lessee_age }}), পিতার নাম: {{ lessee_father }}, ঠিকানা: {{ lessee_address }}, {{ lessee_city }} - {{ lessee_pincode }}
+
+সম্পত্তির ঠিকানা: {{ property_address }}, {{ property_city }} - {{ property_pincode }}
+
+1) ভাড়ার মেয়াদ: {{ lease_period }} বছর ({{ start_date }} থেকে {{ end_date }} পর্যন্ত)
+2) মাসিক ভাড়া: ₹ {{ lease_amount }} (শব্দে: {{ lease_amount_words }}) — প্রতি মাস {{ rent_due_date }} তারিখের মধ্যে প্রদান করতে হবে
+3) নিরাপত্তা আমানত: ₹ {{ security_deposit }} (শব্দে: {{ security_deposit_words }})
+4) নোটিশ সময়কাল: {{ notice_period }} মাস
+5) রুমের সংখ্যা: {{ number_of_rooms }}
+
+সমস্ত আইনগত শর্তাবলী এই চুক্তিতে প্রযোজ্য হবে।
+
+সাক্ষী ১: {{ witness1_name }}, {{ witness1_address }}
+সাক্ষী ২: {{ witness2_name }}, {{ witness2_address }}
+
+{{ execution_place }} এ, {{ execution_date }} তারিখে স্বাক্ষরিত।

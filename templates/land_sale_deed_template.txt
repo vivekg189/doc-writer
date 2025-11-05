@@ -1,0 +1,55 @@
+SALE DEED
+
+This Sale Deed is executed on this {{date}} Day of {{month}}, {{year}}
+
+BETWEEN
+
+Mr. {{seller}}, aged about {{seller_age}} Years, S/o {{seller_father}}, Resident of No. {{seller_address}}, {{seller_city}} - {{seller_pincode}}, hereinafter called the 'Vendor' of the one part
+
+AND
+
+Mr. {{buyer}}, aged about {{buyer_age}} Years, S/o {{buyer_father}}, Resident of No. {{buyer_address}}, {{buyer_city}} - {{buyer_pincode}}, hereinafter called the 'Vendee' of the other part
+
+WITNESSETH:
+
+Whereas the Vendor is the absolute owner in possession of the property more particularly described in the Schedule hereunder written and has full right, title, and interest to sell, transfer, and convey the same.
+
+And whereas the Vendee has agreed to purchase the said property for a total consideration of Rs.{{sale_amount}}/- (Rupees {{sale_amount_words}} only) and the Vendor has agreed to sell the same.
+
+Now this deed witnesseth:
+
+1. That in pursuance of the said agreement and in consideration of the sum of Rs.{{sale_amount}}/- (Rupees {{sale_amount_words}} only) paid by the Vendee to the Vendor (the receipt whereof the Vendor hereby acknowledges), the Vendor doth hereby sell, transfer, and convey unto the Vendee all that piece and parcel of land together with all rights, title, and interest therein.
+
+2. That the Vendor hereby covenants with the Vendee that the Vendor has full right, title, and interest to sell the said property and that the same is free from all encumbrances, charges, liens, and claims whatsoever.
+
+3. That the Vendor hereby delivers possession of the said property to the Vendee on the execution of this deed.
+
+4. That the Vendor shall execute all such documents and do all such acts as may be necessary for perfecting the title of the Vendee in the said property.
+
+5. That the stamp duty and registration charges for this deed shall be borne by the {{stamp_duty_bearer}}.
+
+6. That this deed shall be registered at the office of the Sub-Registrar, {{registration_office}}.
+
+SCHEDULE OF PROPERTY
+
+All that piece and parcel of land bearing Survey No. {{survey_number}}, measuring {{area}} square feet/meters, bounded on the North by {{north_boundary}}, on the South by {{south_boundary}}, on the East by {{east_boundary}}, and on the West by {{west_boundary}}, situated at {{property_address}}, {{property_city}} - {{property_pincode}}, together with all rights, title, and interest therein.
+
+IN WITNESS WHEREOF, the parties hereto have signed this deed on the day, month, and year first above written.
+
+SIGNED AND DELIVERED by the said Vendor
+Mr. {{seller}}
+(Vendor)
+
+SIGNED AND DELIVERED by the said Vendee
+Mr. {{buyer}}
+(Vendee)
+
+WITNESSES:
+1. {{witness1_name}}
+   Address: {{witness1_address}}
+
+2. {{witness2_name}}
+   Address: {{witness2_address}}
+
+Date: {{execution_date}}
+Place: {{execution_place}}

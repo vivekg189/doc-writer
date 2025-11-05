@@ -1,0 +1,60 @@
+POWER OF ATTORNEY
+
+This Power of Attorney is executed on this {{date}} Day of {{month}}, {{year}}
+
+BETWEEN
+
+Mr. {{principal}}, aged about {{principal_age}} Years, S/o {{principal_father}}, Resident of No. {{principal_address}}, {{principal_city}} - {{principal_pincode}}, hereinafter called the 'Principal' of the one part
+
+AND
+
+Mr. {{attorney}}, aged about {{attorney_age}} Years, S/o {{attorney_father}}, Resident of No. {{attorney_address}}, {{attorney_city}} - {{attorney_pincode}}, hereinafter called the 'Attorney' of the other part
+
+WITNESSETH:
+
+Whereas the Principal is desirous of appointing an Attorney to act on his/her behalf for the purposes hereinafter mentioned.
+
+And whereas the Attorney has agreed to act as such Attorney for the Principal.
+
+Now this deed witnesseth:
+
+1. That the Principal doth hereby appoint and constitute the Attorney as his/her true and lawful Attorney to act on his/her behalf and in his/her name and stead for the following purposes:
+
+   a) To represent the Principal in all matters relating to {{matter_description}}
+   b) To sign, execute, and deliver all documents, agreements, and instruments as may be necessary
+   c) To appear before all authorities, courts, and tribunals on behalf of the Principal
+   d) To collect and receive all amounts due to the Principal
+   e) To make payments and disbursements as may be required
+   f) To do all such acts, deeds, and things as may be necessary for the aforesaid purposes
+
+2. That the Attorney shall exercise the powers conferred by this Power of Attorney in good faith and in the best interests of the Principal.
+
+3. That the Attorney shall keep the Principal informed of all actions taken under this Power of Attorney.
+
+4. That this Power of Attorney shall be valid from {{effective_date}} and shall remain in force until {{expiry_date}} or until revoked by the Principal.
+
+5. That the Principal reserves the right to revoke this Power of Attorney at any time by giving written notice to the Attorney.
+
+6. That this Power of Attorney shall be registered at the office of the Sub-Registrar, {{registration_office}}.
+
+7. That the stamp duty and registration charges for this Power of Attorney shall be borne by the {{stamp_duty_bearer}}.
+
+IN WITNESS WHEREOF, the Principal has signed this Power of Attorney on the day, month, and year first above written.
+
+SIGNED AND DELIVERED by the said Principal
+Mr. {{principal}}
+(Principal)
+
+SIGNED AND DELIVERED by the said Attorney
+Mr. {{attorney}}
+(Attorney)
+
+WITNESSES:
+1. {{witness1_name}}
+   Address: {{witness1_address}}
+
+2. {{witness2_name}}
+   Address: {{witness2_address}}
+
+Date: {{execution_date}}
+Place: {{execution_place}}

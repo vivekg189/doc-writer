@@ -1,0 +1,24 @@
+# Hindi House Lease Template - Translation Pending
+
+यह एक हिंदी में घर किराया अनुबंध का टेम्पलेट है। कृपया इसे अनुवादित करें।
+
+{{ date }} {{ month }} {{ year }} को यह अनुबंध निम्नलिखित पक्षों के बीच किया गया:
+
+किरायेदार (Lessor): {{ lessor }} (आयु: {{ lessor_age }}), पिता: {{ lessor_father }}, पता: {{ lessor_address }}, {{ lessor_city }} - {{ lessor_pincode }}
+
+किरायेदार (Lessee): {{ lessee }} (आयु: {{ lessee_age }}), पिता: {{ lessee_father }}, पता: {{ lessee_address }}, {{ lessee_city }} - {{ lessee_pincode }}
+
+संपत्ति का पता: {{ property_address }}, {{ property_city }} - {{ property_pincode }}
+
+1) किराये की अवधि: {{ lease_period }} वर्ष ({{ start_date }} से {{ end_date }} तक)
+2) मासिक किराया: ₹ {{ lease_amount }} (शब्दों में: {{ lease_amount_words }}) — हर महीने {{ rent_due_date }} तक भुगतान करना होगा
+3) सुरक्षा जमा: ₹ {{ security_deposit }} (शब्दों में: {{ security_deposit_words }})
+4) नोटिस अवधि: {{ notice_period }} महीने
+5) कमरों की संख्या: {{ number_of_rooms }}
+
+सभी कानूनी नियम इस अनुबंध पर लागू होंगे।
+
+साक्षी 1: {{ witness1_name }}, {{ witness1_address }}
+साक्षी 2: {{ witness2_name }}, {{ witness2_address }}
+
+{{ execution_place }} में, {{ execution_date }} को हस्ताक्षरित।

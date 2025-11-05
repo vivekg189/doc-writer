@@ -1,0 +1,23 @@
+# Bengali Land Sale Deed Template - Translation Pending
+
+এই একটি বাংলা ভাষায় জমি বিক্রয় দলিলের টেমপ্লেট। অনুগ্রহ করে এটি অনুবাদ করুন।
+
+{{ date }} {{ month }} {{ year }} তারিখে নিম্নলিখিত পক্ষদের মধ্যে এই দলিল সম্পাদিত হয়েছে:
+
+বিক্রেতা: {{ seller }} (বয়স: {{ seller_age }}), পিতার নাম: {{ seller_father }}, ঠিকানা: {{ seller_address }}, {{ seller_city }} - {{ seller_pincode }}
+
+ক্রেতা: {{ buyer }} (বয়স: {{ buyer_age }}), পিতার নাম: {{ buyer_father }}, ঠিকানা: {{ buyer_address }}, {{ buyer_city }} - {{ buyer_pincode }}
+
+বিক্রয়যোগ্য সম্পত্তির ঠিকানা: {{ property_address }}, {{ property_city }} - {{ property_pincode }}
+সার্ভে নম্বর: {{ survey_number }} | এলাকা: {{ area }} বর্গফুট
+উত্তর সীমানা: {{ north_boundary }} | দক্ষিণ সীমানা: {{ south_boundary }} | পূর্ব সীমানা: {{ east_boundary }} | পশ্চিম সীমানা: {{ west_boundary }}
+
+মোট মূল্য: ₹ {{ sale_amount }} (শব্দে: {{ sale_amount_words }})
+বিক্রয় তারিখ: {{ sale_date }}
+
+এই দলিলের মাধ্যমে, বিক্রেতা সম্পূর্ণ অধিকার ক্রেতাকে হস্তান্তর করছেন। নিবন্ধন এবং স্ট্যাম্প ফি আইন অনুযায়ী {{ stamp_duty_bearer }} বহন করবেন।
+
+সাক্ষী ১: {{ witness1_name }}, {{ witness1_address }}
+সাক্ষী ২: {{ witness2_name }}, {{ witness2_address }}
+
+{{ execution_place }} এ, {{ execution_date }} তারিখে স্বাক্ষরিত।

@@ -1,0 +1,19 @@
+மூல அதிகார பத்திரம் (பவர் ஆஃப் அட்டார்னி)
+
+இந்த ஆவணம் {{ date }} {{ month }} {{ year }} அன்று வழங்கப்படுகிறது.
+
+முதன்மை (Principal): {{ principal }} (வயது: {{ principal_age }}), தந்தை: {{ principal_father }}, முகவரி: {{ principal_address }}, {{ principal_city }} - {{ principal_pincode }}
+
+அட்டார்னி (Attorney): {{ attorney }} (வயது: {{ attorney_age }}), தந்தை: {{ attorney_father }}, முகவரி: {{ attorney_address }}, {{ attorney_city }} - {{ attorney_pincode }}
+
+அரசால் வழங்கப்பட்ட அதிகாரங்கள்: {{ matter_description }} தொடர்பான அனைத்து நடவடிக்கைகளையும் மேற்கொள்ள அதிகாரம் வழங்கப்படுகிறது. இதன் பொருட்டு தேவையான ஒப்பந்தங்கள், விண்ணப்பங்கள், ஆவணங்கள் மீது கையெழுத்திட அதிகாரம் உள்ளது.
+
+செயல்படும் நாள்: {{ effective_date }} முதல், முடிவு நாள்: {{ expiry_date }} வரை.
+
+இந்த அதிகார பத்திரத்தை எந்நேரமும் சட்டப்படி வாபஸ் பெறும் உரிமை முதன்மைவருக்கு உண்டு.
+
+சாட்சி 1: {{ witness1_name }}, {{ witness1_address }}
+சாட்சி 2: {{ witness2_name }}, {{ witness2_address }}
+
+{{ execution_place }} இல், {{ execution_date }} அன்று கையெழுத்திடப்பட்டது.
+

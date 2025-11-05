@@ -25,11 +25,12 @@
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
             backdrop-filter: blur(20px);
             overflow: hidden;
-            animation: slideUp 0.8s ease-out;
+            animation: slideUp 0.8s ease-out, cardFlip 1.2s ease-out;
             position: relative;
             z-index: 1;
             max-width: 450px;
             width: 100%;
+            transform-style: preserve-3d;
         }
         @keyframes slideUp {
             from {
@@ -41,8 +42,22 @@
                 transform: translateY(0);
             }
         }
+        @keyframes cardFlip {
+            0% {
+                transform: rotateY(-90deg) scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: rotateY(-45deg) scale(0.9);
+                opacity: 0.5;
+            }
+            100% {
+                transform: rotateY(0deg) scale(1);
+                opacity: 1;
+            }
+        }
         .login-header {
-            background: linear-gradient(135deg, #4285f4 0%, #1976d2 100%);
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
             color: white;
             padding: 3rem 2rem 2rem;
             text-align: center;
@@ -85,13 +100,13 @@
             background: rgba(255, 255, 255, 0.9);
         }
         .form-control:focus {
-            border-color: #4285f4;
-            box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.15);
+            border-color: #6c757d;
+            box-shadow: 0 0 0 4px rgba(108, 117, 125, 0.15);
             background: rgba(255, 255, 255, 1);
             transform: translateY(-1px);
         }
         .btn-login {
-            background: linear-gradient(135deg, #4285f4 0%, #1976d2 100%);
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
             border: none;
             border-radius: 12px;
             padding: 0.9rem 1.5rem;
@@ -134,7 +149,7 @@
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             border: 2px solid #e2e8f0;
             border-right: none;
-            color: #4285f4;
+            color: #6c757d;
             border-radius: 12px 0 0 12px;
             font-size: 1.1rem;
         }
@@ -162,8 +177,8 @@
             color: #374151;
         }
         .google-btn:hover {
-            border-color: #4285f4;
-            box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.1);
+            border-color: #6c757d;
+            box-shadow: 0 0 0 4px rgba(108, 117, 125, 0.1);
             transform: translateY(-1px);
         }
         .google-btn img {
@@ -171,10 +186,19 @@
             height: 20px;
             margin-right: 12px;
         }
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #A8A8A8;">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
                 <i class="fas fa-gavel me-2"></i>Legal Document Generator
@@ -182,6 +206,7 @@
         </div>
     </nav>
 
+    <canvas id="three-canvas"></canvas>
     <div class="login-container">
         <div class="container">
             <div class="row justify-content-center">
@@ -253,7 +278,7 @@
                         </div>
                         <div class="login-footer">
                             <p class="mb-0">Don't have an account?
-                                <a href="{{ url_for('auth.signup') }}">Create one here</a>
+                                <a href="{{ url_for('auth.signup') }}" class="flip-link">Create one here</a>
                             </p>
                         </div>
                     </div>
@@ -293,33 +318,37 @@
         }
         
         window.onload = function() {
-            if ("{{ google_client_id }}" && "{{ google_client_id }}" !== "None" && "{{ google_client_id }}" !== "") {
-                try {
-                    google.accounts.id.initialize({
-                        client_id: "{{ google_client_id }}",
-                        callback: handleGoogleLogin,
-                        auto_select: false,
-                        cancel_on_tap_outside: false,
-                        use_fedcm_for_prompt: false
-                    });
-                    google.accounts.id.renderButton(
-                        document.getElementById('googleLoginBtn'),
-                        { 
-                            theme: 'outline', 
-                            size: 'large', 
-                            width: '100%',
-                            text: 'signin_with',
-                            shape: 'rectangular'
-                        }
-                    );
-                } catch (error) {
-                    console.log('Google Sign-In not available:', error);
+            const googleClientId = "{{ google_client_id }}";
+            if (googleClientId && googleClientId !== "None" && googleClientId !== "" && googleClientId !== "undefined") {
+                if (typeof google !== 'undefined' && google.accounts) {
+                    try {
+                        google.accounts.id.initialize({
+                            client_id: googleClientId,
+                            callback: handleGoogleLogin
+                        });
+                        google.accounts.id.renderButton(
+                            document.getElementById('googleLoginBtn'),
+                            { 
+                                theme: 'outline', 
+                                size: 'large', 
+                                width: '100%',
+                                text: 'signin_with',
+                                shape: 'rectangular'
+                            }
+                        );
+                    } catch (error) {
+                        console.log('Google Sign-In initialization failed:', error);
+                        document.getElementById('googleLoginBtn').style.display = 'none';
+                        document.querySelector('.text-center.my-3').style.display = 'none';
+                    }
+                } else {
+                    console.log('Google API not loaded');
                     document.getElementById('googleLoginBtn').style.display = 'none';
-                    document.getElementById('customGoogleBtn').style.display = 'flex';
+                    document.querySelector('.text-center.my-3').style.display = 'none';
                 }
             } else {
                 document.getElementById('googleLoginBtn').style.display = 'none';
-                document.getElementById('customGoogleBtn').style.display = 'none';
+                document.querySelector('.text-center.my-3').style.display = 'none';
             }
         };
         
@@ -397,6 +426,44 @@
                 googleBtn.style.borderRadius = '12px';
             }
         }, 1000);
+        
+        // Three.js Background Animation
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        
+        const geometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const material = new THREE.MeshBasicMaterial({ color: 0x6c757d, transparent: true, opacity: 0.1 });
+        
+        const spheres = [];
+        for (let i = 0; i < 50; i++) {
+            const sphere = new THREE.Mesh(geometry, material);
+            sphere.position.x = (Math.random() - 0.5) * 20;
+            sphere.position.y = (Math.random() - 0.5) * 20;
+            sphere.position.z = (Math.random() - 0.5) * 20;
+            spheres.push(sphere);
+            scene.add(sphere);
+        }
+        
+        camera.position.z = 5;
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            spheres.forEach(sphere => {
+                sphere.rotation.x += 0.01;
+                sphere.rotation.y += 0.01;
+                sphere.position.y += Math.sin(Date.now() * 0.001 + sphere.position.x) * 0.002;
+            });
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>

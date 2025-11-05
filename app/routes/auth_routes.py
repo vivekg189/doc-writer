@@ -151,6 +151,9 @@ def api_google_login():
         if not credential:
             return jsonify({'error': 'No credential provided'}), 400
         
+        if not GOOGLE_CLIENT_ID:
+            return jsonify({'error': 'Google OAuth not configured'}), 400
+            
         # Verify the Google ID token
         idinfo = id_token.verify_oauth2_token(
             credential, requests.Request(), GOOGLE_CLIENT_ID)
@@ -222,6 +225,9 @@ def api_google_signup():
         if not credential:
             return jsonify({'error': 'No credential provided'}), 400
         
+        if not GOOGLE_CLIENT_ID:
+            return jsonify({'error': 'Google OAuth not configured'}), 400
+            
         # Verify the Google ID token
         idinfo = id_token.verify_oauth2_token(
             credential, requests.Request(), GOOGLE_CLIENT_ID)

@@ -11,8 +11,14 @@ import tempfile
 load_dotenv()
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-app.secret_key = 'your-secret-key-here'  # Change this in production
-CORS(app, origins=['http://localhost:5000', 'http://127.0.0.1:5000'], supports_credentials=True)
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-secret-key-here')
+CORS(app, origins=['http://localhost:5000', 'http://127.0.0.1:5000'], supports_credentials=True, allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'])
+
+@app.after_request
+def after_request(response):
+    response.headers['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
+    response.headers['Cross-Origin-Embedder-Policy'] = 'unsafe-none'
+    return response
 nlp = spacy.load('en_core_web_sm')
 processor = LegalDocumentProcessor()
 

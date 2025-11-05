@@ -10,7 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #A8A8A8;">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">Legal Document Generator</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -49,34 +49,50 @@
     </nav>
 
     <!-- Hero Section -->
-    <div class="bg-white py-5">
+    <div class="bg-white py-5" style="min-height: 70vh; display: flex; align-items: center;">
         <div class="container text-center">
-            <h1 class="display-4 mb-3 text-primary"><i class="fas fa-gavel me-3"></i>Legal Document Generator</h1>
-            <p class="lead mb-4 text-muted">Professional Legal Documents Made Simple</p>
-            
-            <div class="row justify-content-center mb-5">
-                <div class="col-lg-8">
-                    <h3 class="mb-3 text-dark">Transform Your Ideas Into Legal Documents</h3>
-                    <p class="fs-5 text-muted">Simply describe what you need in plain English, and our intelligent system will create a professional, legally-compliant document tailored to your specific requirements.</p>
-                </div>
-            </div>
-            
-            <div class="row text-center justify-content-center">
-                <div class="col-md-6 mb-3">
-                    <i class="fas fa-language fa-3x mb-3 text-success"></i>
-                    <h5 class="text-dark">Multi-Language Support</h5>
-                    <p class="mb-0 text-muted">Available in English, Hindi, and 8+ regional languages</p>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <i class="fas fa-download fa-3x mb-3 text-info"></i>
-                    <h5 class="text-dark">Multiple Formats</h5>
-                    <p class="mb-0 text-muted">Download as DOCX, PDF, or view as HTML</p>
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <h1 class="display-3 fw-bold mb-4" style="color: #6c757d;">
+                        <i class="fas fa-gavel me-3"></i>Legal Document Generator
+                    </h1>
+                    <h2 class="h3 mb-4 text-muted">Professional Legal Documents Made Simple</h2>
+                    
+                    <div class="mb-5">
+                        <h3 class="h2 mb-4 text-dark">Transform Your Ideas Into Legal Documents</h3>
+                        <p class="lead fs-4 text-muted mb-4">
+                            Simply describe what you need in plain English, and our intelligent system will create a professional, legally-compliant document tailored to your specific requirements.
+                        </p>
+                    </div>
+                    
+                    <div class="row text-center justify-content-center g-4">
+                        <div class="col-md-6">
+                            <div class="feature-card p-4 rounded-3 shadow-sm" style="background: #f8f9fa; border: 1px solid #e9ecef;">
+                                <i class="fas fa-language fa-4x mb-3 text-success"></i>
+                                <h5 class="text-dark fw-bold">Multi-Language Support</h5>
+                                <p class="mb-0 text-muted">Available in English, Hindi, and 8+ regional languages</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-card p-4 rounded-3 shadow-sm" style="background: #f8f9fa; border: 1px solid #e9ecef;">
+                                <i class="fas fa-download fa-4x mb-3 text-info"></i>
+                                <h5 class="text-dark fw-bold">Multiple Formats</h5>
+                                <p class="mb-0 text-muted">Download as DOCX, PDF, or view as HTML</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <a href="#document-generator" class="btn btn-lg px-5 py-3 rounded-pill shadow-lg" style="background-color: #6c757d; border-color: #6c757d; color: white;">
+                            <i class="fas fa-rocket me-2"></i>Get Started Now
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container mt-5">
+    <div class="container mt-5" id="document-generator">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
@@ -89,18 +105,27 @@
         {% endwith %}
 
         <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card fade-in">
-                    <div class="card-body">
-<form method="POST" action="{{ url_for('document.generate_from_prompt') }}">
-                            <div class="mb-3 d-flex align-items-center">
-                                <label for="prompt" class="form-label me-3 mb-0 flex-shrink-0">Document Description</label>
-                                <textarea class="form-control" id="prompt" name="prompt" rows="4" placeholder="Example: Create a rental agreement between John Smith (landlord) and Jane Doe (tenant) for a property at 123 Main Street, Mumbai for Rs. 25,000 per month starting from January 1, 2024 for 12 months." required></textarea>
-                                <button type="button" id="voice-input-btn" class="btn btn-secondary voice-input-btn ms-3" title="Click to start/stop voice input">
-                                    <i class="fas fa-microphone"></i> Voice Input
+            <div class="col-lg-10">
+                <div class="card fade-in shadow-lg border-0">
+                    <div class="card-body p-5">
+                        <form method="POST" action="{{ url_for('document.generate_from_prompt') }}">
+                            <div class="mb-4">
+                                <label for="prompt" class="form-label h4 mb-3" style="color: #6c757d;">
+                                    <i class="fas fa-edit me-2"></i>Document Description
+                                </label>
+                                <textarea class="form-control form-control-lg" id="prompt" name="prompt" rows="6" 
+                                    style="font-size: 1.1rem; line-height: 1.6; border: 2px solid #e9ecef; border-radius: 12px;" 
+                                    placeholder="Example: Create a rental agreement between John Smith (landlord) and Jane Doe (tenant) for a property at 123 Main Street, Mumbai for Rs. 25,000 per month starting from January 1, 2024 for 12 months." 
+                                    required></textarea>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="submit" class="btn btn-lg px-5 py-3" style="background-color: #6c757d; border-color: #6c757d; color: white;">
+                                    <i class="fas fa-magic me-2"></i>Generate Document
+                                </button>
+                                <button type="button" id="voice-input-btn" class="btn btn-lg voice-input-btn" style="background-color: #6c757d; border-color: #6c757d; color: white;" title="Click to start/stop voice input">
+                                    <i class="fas fa-microphone me-2"></i>Voice Input
                                 </button>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-lg mt-3">Generate Document</button>
                         </form>
                     </div>
                 </div>
@@ -110,19 +135,19 @@
         <hr class="my-5">
 
         <div class="text-center mb-5">
-            <h3 class="text-primary mb-3">Quick Start Templates</h3>
-            <p class="text-muted">Choose from our most popular document types for faster generation</p>
+            <h3 class="mb-3 text-dark">Quick Start Templates</h3>
+            <p class="text-dark">Choose from our most popular document types for faster generation</p>
         </div>
         <div class="row" id="documentTypes">
             <div class="col-md-6 mb-4">
                 <div class="card fade-in">
                     <div class="card-body">
                         <div class="text-center mb-3">
-                            <i class="fas fa-home fa-3x text-primary mb-2"></i>
+                            <i class="fas fa-home fa-3x mb-2" style="color: #6c757d;"></i>
                         </div>
                         <h5 class="card-title text-center">Rental Agreement</h5>
                         <p class="card-text text-center">Create comprehensive rental agreements with tenant protection, rent terms, and legal compliance for residential properties.</p>
-                        <a href="{{ url_for('document.document_form', doc_type='rental_agreement') }}" class="btn btn-outline-primary">Generate</a>
+                        <a href="{{ url_for('document.document_form', doc_type='rental_agreement') }}" class="btn" style="border: 2px solid #6c757d; color: #6c757d;">Generate</a>
                     </div>
                 </div>
             </div>
@@ -134,7 +159,7 @@
                         </div>
                         <h5 class="card-title text-center">Land Sale Deed</h5>
                         <p class="card-text text-center">Generate legally binding property sale deeds with clear ownership transfer, payment terms, and registration-ready documentation.</p>
-                        <a href="{{ url_for('document.document_form', doc_type='land_sale_deed') }}" class="btn btn-outline-primary">Generate</a>
+                        <a href="{{ url_for('document.document_form', doc_type='land_sale_deed') }}" class="btn" style="border: 2px solid #6c757d; color: #6c757d;">Generate</a>
                     </div>
                 </div>
             </div>
@@ -146,7 +171,7 @@
                         </div>
                         <h5 class="card-title text-center">Power of Attorney</h5>
                         <p class="card-text text-center">Draft comprehensive power of attorney documents with specific authority delegation, time limits, and revocation clauses.</p>
-                        <a href="{{ url_for('document.document_form', doc_type='power_of_attorney') }}" class="btn btn-outline-primary">Generate</a>
+                        <a href="{{ url_for('document.document_form', doc_type='power_of_attorney') }}" class="btn" style="border: 2px solid #6c757d; color: #6c757d;">Generate</a>
                     </div>
                 </div>
             </div>
@@ -158,7 +183,7 @@
                         </div>
                         <h5 class="card-title text-center">House Lease</h5>
                         <p class="card-text text-center">Generate detailed house lease agreements with maintenance clauses, security deposits, and tenant-landlord responsibilities.</p>
-                        <a href="{{ url_for('document.document_form', doc_type='house_lease') }}" class="btn btn-outline-primary">Generate</a>
+                        <a href="{{ url_for('document.document_form', doc_type='house_lease') }}" class="btn" style="border: 2px solid #6c757d; color: #6c757d;">Generate</a>
                     </div>
                 </div>
             </div>

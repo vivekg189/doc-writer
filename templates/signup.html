@@ -31,10 +31,11 @@
             background: white;
             border: 1px solid #e5e7eb;
             border-radius: 25px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1), 0 0 20px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1), 0 0 20px rgba(108, 117, 125, 0.1);
             overflow: hidden;
-            animation: cardFloat 0.8s ease-out, glow 3s ease-in-out infinite alternate;
+            animation: cardFloat 0.8s ease-out, glow 3s ease-in-out infinite alternate, cardFlipIn 1.5s ease-out;
             position: relative;
+            transform-style: preserve-3d;
         }
         .signup-card::before {
             content: '';
@@ -56,6 +57,24 @@
                 transform: translateY(0) scale(1);
             }
         }
+        @keyframes cardFlipIn {
+            0% {
+                transform: rotateX(-90deg) scale(0.7);
+                opacity: 0;
+            }
+            30% {
+                transform: rotateX(-60deg) scale(0.8);
+                opacity: 0.3;
+            }
+            70% {
+                transform: rotateX(-20deg) scale(0.95);
+                opacity: 0.8;
+            }
+            100% {
+                transform: rotateX(0deg) scale(1);
+                opacity: 1;
+            }
+        }
         @keyframes glow {
             from { box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 255, 255, 0.1); }
             to { box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2), 0 0 40px rgba(255, 255, 255, 0.3); }
@@ -65,7 +84,7 @@
             100% { left: 100%; }
         }
         .signup-header {
-            background: linear-gradient(135deg, #4285f4 0%, #1976d2 50%, #42a5f5 100%);
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 50%, #868e96 100%);
             color: white;
             padding: 2.5rem;
             text-align: center;
@@ -113,8 +132,8 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .form-control:focus {
-            border-color: #4285f4;
-            box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.2), 0 0 20px rgba(66, 133, 244, 0.3);
+            border-color: #6c757d;
+            box-shadow: 0 0 0 4px rgba(108, 117, 125, 0.2), 0 0 20px rgba(108, 117, 125, 0.3);
             background: white;
             transform: translateY(-2px);
         }
@@ -122,7 +141,7 @@
             color: rgba(0, 0, 0, 0.5);
         }
         .btn-signup {
-            background: linear-gradient(135deg, #4285f4 0%, #1976d2 50%, #42a5f5 100%);
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 50%, #868e96 100%);
             border: none;
             border-radius: 15px;
             padding: 1rem 2.5rem;
@@ -149,7 +168,7 @@
         }
         .btn-signup:hover {
             transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(66, 133, 244, 0.4), 0 0 30px rgba(66, 165, 245, 0.3);
+            box-shadow: 0 15px 35px rgba(108, 117, 125, 0.4), 0 0 30px rgba(134, 142, 150, 0.3);
         }
         .btn-signup:active {
             transform: translateY(-1px) scale(1.02);
@@ -161,7 +180,7 @@
             border-top: 1px solid #e5e7eb;
         }
         .signup-footer a {
-            color: #4285f4;
+            color: #6c757d;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
@@ -174,21 +193,21 @@
             left: 0;
             width: 0;
             height: 2px;
-            background: linear-gradient(90deg, #4285f4, #42a5f5);
+            background: linear-gradient(90deg, #6c757d, #868e96);
             transition: width 0.3s ease;
         }
         .signup-footer a:hover::after {
             width: 100%;
         }
         .signup-footer a:hover {
-            color: #42a5f5;
+            color: #868e96;
             transform: translateY(-1px);
         }
         .input-group-text {
             background: #f8fafc;
             border: 2px solid #e5e7eb;
             border-right: none;
-            color: #6b7280;
+            color: #6c757d;
             border-radius: 15px 0 0 15px;
         }
         .alert {
@@ -270,10 +289,19 @@
             height: 20px;
             margin-right: 12px;
         }
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #A8A8A8;">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
                 <i class="fas fa-gavel me-2"></i>Legal Document Generator
@@ -281,6 +309,7 @@
         </div>
     </nav>
 
+    <canvas id="three-canvas"></canvas>
     <div class="signup-container">
         <div class="container">
             <div class="row justify-content-center">
@@ -358,7 +387,7 @@
                         </div>
                         <div class="signup-footer">
                             <p class="mb-0">Already have an account?
-                                <a href="{{ url_for('auth.login') }}">Sign in here</a>
+                                <a href="{{ url_for('auth.login') }}" class="flip-link">Sign in here</a>
                             </p>
                         </div>
                     </div>
@@ -398,33 +427,37 @@
         }
         
         window.onload = function() {
-            if ("{{ google_client_id }}" && "{{ google_client_id }}" !== "None" && "{{ google_client_id }}" !== "") {
-                try {
-                    google.accounts.id.initialize({
-                        client_id: "{{ google_client_id }}",
-                        callback: handleGoogleSignup,
-                        auto_select: false,
-                        cancel_on_tap_outside: false,
-                        use_fedcm_for_prompt: false
-                    });
-                    google.accounts.id.renderButton(
-                        document.getElementById('googleSignupBtn'),
-                        { 
-                            theme: 'outline', 
-                            size: 'large', 
-                            width: '100%',
-                            text: 'signup_with',
-                            shape: 'rectangular'
-                        }
-                    );
-                } catch (error) {
-                    console.log('Google Sign-In not available:', error);
+            const googleClientId = "{{ google_client_id }}";
+            if (googleClientId && googleClientId !== "None" && googleClientId !== "" && googleClientId !== "undefined") {
+                if (typeof google !== 'undefined' && google.accounts) {
+                    try {
+                        google.accounts.id.initialize({
+                            client_id: googleClientId,
+                            callback: handleGoogleSignup
+                        });
+                        google.accounts.id.renderButton(
+                            document.getElementById('googleSignupBtn'),
+                            { 
+                                theme: 'outline', 
+                                size: 'large', 
+                                width: '100%',
+                                text: 'signup_with',
+                                shape: 'rectangular'
+                            }
+                        );
+                    } catch (error) {
+                        console.log('Google Sign-In initialization failed:', error);
+                        document.getElementById('googleSignupBtn').style.display = 'none';
+                        document.querySelector('.text-center.my-3').style.display = 'none';
+                    }
+                } else {
+                    console.log('Google API not loaded');
                     document.getElementById('googleSignupBtn').style.display = 'none';
-                    document.getElementById('customGoogleSignupBtn').style.display = 'flex';
+                    document.querySelector('.text-center.my-3').style.display = 'none';
                 }
             } else {
                 document.getElementById('googleSignupBtn').style.display = 'none';
-                document.getElementById('customGoogleSignupBtn').style.display = 'none';
+                document.querySelector('.text-center.my-3').style.display = 'none';
             }
         };
         
@@ -581,6 +614,47 @@
                 googleBtn.style.borderRadius = '15px';
             }
         }, 1000);
+        
+        // Three.js Background Animation
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        
+        const geometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
+        const material = new THREE.MeshBasicMaterial({ color: 0x6c757d, transparent: true, opacity: 0.08 });
+        
+        const cubes = [];
+        for (let i = 0; i < 80; i++) {
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.x = (Math.random() - 0.5) * 25;
+            cube.position.y = (Math.random() - 0.5) * 25;
+            cube.position.z = (Math.random() - 0.5) * 25;
+            cube.rotation.x = Math.random() * Math.PI;
+            cube.rotation.y = Math.random() * Math.PI;
+            cubes.push(cube);
+            scene.add(cube);
+        }
+        
+        camera.position.z = 8;
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            cubes.forEach((cube, index) => {
+                cube.rotation.x += 0.005;
+                cube.rotation.y += 0.005;
+                cube.position.y += Math.sin(Date.now() * 0.001 + index) * 0.001;
+                cube.position.x += Math.cos(Date.now() * 0.0008 + index) * 0.001;
+            });
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>

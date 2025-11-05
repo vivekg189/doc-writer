@@ -28,6 +28,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endif %}
+            {% if reverted %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-undo"></i> Document reverted successfully! You can now edit and regenerate it.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
 
         <div class="row justify-content-center">
             <div class="col-md-8">

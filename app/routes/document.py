@@ -555,11 +555,7 @@ def generate_document():
             user_id = session['user_id']
             print(f"DEBUG: Found user_id in session: {user_id} (type: {type(user_id)})")
             
-            # Add to history
-            result = add_user_history(user_id, 'generate_document', f'Generated {doc_type} in {language}')
-            print(f"DEBUG: History add result: {result}")
-            
-            # Save generated document
+            # Save generated document first to get document ID
             title = f"{doc_type.replace('_', ' ').title()} - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
             doc_result = save_generated_document(
                 user_id, 
@@ -570,6 +566,11 @@ def generate_document():
                 data  # Save the form data
             )
             print(f"DEBUG: Document save result: {doc_result}")
+            
+            # Add to history with document ID
+            doc_id = doc_result[0]['id'] if doc_result and len(doc_result) > 0 else None
+            result = add_user_history(user_id, 'generate_document', f'Generated {doc_type} in {language}', doc_id)
+            print(f"DEBUG: History add result: {result}")
         else:
             print("DEBUG: No user_id found in session - user not logged in")
             print(f"DEBUG: Available session data: {dict(session)}")
@@ -617,11 +618,7 @@ def generate_from_prompt():
             user_id = session['user_id']
             print(f"DEBUG PROMPT: Found user_id in session: {user_id}")
             
-            # Add to history
-            result = add_user_history(user_id, 'generate_from_prompt', f'Generated {doc_type} from prompt in {language}')
-            print(f"DEBUG PROMPT: History add result: {result}")
-            
-            # Save generated document
+            # Save generated document first to get document ID
             title = f"{doc_type.replace('_', ' ').title()} from Prompt - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
             doc_result = save_generated_document(
                 user_id, 
@@ -632,6 +629,11 @@ def generate_from_prompt():
                 entities  # Save the extracted entities
             )
             print(f"DEBUG PROMPT: Document save result: {doc_result}")
+            
+            # Add to history with document ID
+            doc_id = doc_result[0]['id'] if doc_result and len(doc_result) > 0 else None
+            result = add_user_history(user_id, 'generate_from_prompt', f'Generated {doc_type} from prompt in {language}', doc_id)
+            print(f"DEBUG PROMPT: History add result: {result}")
         else:
             print("DEBUG PROMPT: No user_id found in session - user not logged in")
 
@@ -718,7 +720,7 @@ def api_generate_document():
             user_id = session['user_id']
             print(f"DEBUG API: Found user_id in session: {user_id}")
             
-            # Add to history
+            # Add to history (no document ID for API downloads)
             result = add_user_history(user_id, 'download_document', f'Downloaded {doc_type} as {format_type} in {language}')
             print(f"DEBUG API: History add result: {result}")
             
@@ -888,7 +890,7 @@ def api_download_document(doc_id, format):
         document = response.data[0]
         
         # Log download activity
-        result = add_user_history(session['user_id'], 'download_saved_document', f'Downloaded saved {document["document_type"]} as {format}')
+        result = add_user_history(session['user_id'], 'download_saved_document', f'Downloaded saved {document["document_type"]} as {format}', doc_id)
         print(f"DEBUG DOWNLOAD: History add result: {result}")
         
         # Create file based on format
@@ -901,3 +903,84 @@ def api_download_document(doc_id, format):
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@document_bp.route('/api/document/<doc_id>/revert')
+def api_revert_document(doc_id):
+    """Revert to a saved document for editing"""
+    try:
+        if 'user_id' not in session:
+            flash('Please log in to access saved documents.', 'error')
+            return render_template('index.html')
+        
+        from app.models.history import supabase
+        if not supabase:
+            flash('Database connection failed.', 'error')
+            return render_template('index.html')
+        
+        # Get document from database
+        response = supabase.table('generated_documents').select('*').eq('id', doc_id).eq('user_id', session['user_id']).execute()
+        
+        if not response.data:
+            flash('Document not found.', 'error')
+            return render_template('index.html')
+        
+        document = response.data[0]
+        doc_type = document['document_type']
+        language = document['language']
+        saved_data = document.get('data', {})
+        
+        # Log revert activity
+        add_user_history(session['user_id'], 'revert_document', f'Reverted to saved {doc_type}')
+        
+        # Get document configuration
+        if doc_type not in documents:
+            flash('Invalid document type.', 'error')
+            return render_template('index.html')
+        
+        # Convert template field names back to form field names
+        reverse_field_mapping = {
+            'rental_agreement': {
+                'landlord': 'owner_name', 'landlord_age': 'owner_age', 'landlord_father': 'owner_father',
+                'landlord_address': 'owner_address', 'landlord_city': 'owner_city', 'landlord_pincode': 'owner_pincode',
+                'tenant': 'renter_name', 'tenant_age': 'renter_age', 'tenant_father': 'renter_father',
+                'tenant_address': 'renter_address', 'tenant_city': 'renter_city', 'tenant_pincode': 'renter_pincode'
+            },
+            'land_sale_deed': {},
+            'power_of_attorney': {},
+            'house_lease': {}
+        }
+        
+        # Map saved data back to form fields
+        form_data = {}
+        if doc_type in reverse_field_mapping:
+            for template_field, form_field in reverse_field_mapping[doc_type].items():
+                if template_field in saved_data:
+                    form_data[form_field] = saved_data[template_field]
+            # Copy unmapped fields directly
+            for key, value in saved_data.items():
+                if key not in reverse_field_mapping[doc_type] and key in documents[doc_type]['fields']:
+                    form_data[key] = value
+        else:
+            form_data = saved_data
+        
+        # Prepare language options
+        language_mapping = {
+            'en': 'English', 'hi': 'Hindi', 'bn': 'Bengali', 'te': 'Telugu',
+            'mr': 'Marathi', 'ur': 'Urdu', 'gu': 'Gujarati', 'kn': 'Kannada',
+            'or': 'Odia', 'ta': 'Tamil'
+        }
+        languages = [{'code': lang, 'name': language_mapping.get(lang, lang.upper())} 
+                    for lang in documents[doc_type]['templates'].keys()]
+        
+        # Render the document form with saved data
+        return render_template('document_form.html', 
+                             doc_type=doc_type, 
+                             fields=documents[doc_type]['fields'],
+                             languages=languages,
+                             selected_language=language,
+                             values=form_data,
+                             reverted=True)
+    
+    except Exception as e:
+        flash(f'Error reverting to document: {str(e)}', 'error')
+        return render_template('index.html')

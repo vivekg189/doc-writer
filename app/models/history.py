@@ -20,7 +20,7 @@ if SUPABASE_URL and SUPABASE_SERVICE_KEY:
 else:
     print(f"Missing Supabase credentials: URL={bool(SUPABASE_URL)}, SERVICE_KEY={bool(SUPABASE_SERVICE_KEY)}")
 
-def add_user_history(user_id, action, details=None):
+def add_user_history(user_id, action, details=None, document_id=None):
     try:
         # Skip history if no user_id or no supabase client
         if not user_id or not supabase:
@@ -34,6 +34,7 @@ def add_user_history(user_id, action, details=None):
             'user_id': user_id_str,
             'action': action,
             'details': details,
+            'document_id': document_id,
             'timestamp': datetime.utcnow().isoformat()
         }
         

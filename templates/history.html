@@ -100,10 +100,12 @@
                                                     {% endif %}
                                                 </td>
                                                 <td>
-                                                    {% if item.action == 'generate_document' %}
-                                                        <span class="badge bg-success"><i class="fas fa-file-contract"></i> Document Generated</span>
-                                                    {% elif item.action == 'generate_from_prompt' %}
-                                                        <span class="badge bg-primary"><i class="fas fa-magic"></i> Prompt Generated</span>
+                                                    {% if item.action == 'generate_document' and item.document_id %}
+                                                        <span class="badge bg-success clickable-badge" onclick="viewDocument('{{ item.document_id }}')" style="cursor: pointer;"><i class="fas fa-file-contract"></i> Document Generated</span>
+                                                    {% elif item.action == 'generate_from_prompt' and item.document_id %}
+                                                        <span class="badge bg-primary clickable-badge" onclick="viewDocument('{{ item.document_id }}')" style="cursor: pointer;"><i class="fas fa-magic"></i> Prompt Generated</span>
+                                                    {% elif item.action == 'download_saved_document' and item.document_id %}
+                                                        <span class="badge bg-info clickable-badge" onclick="viewDocument('{{ item.document_id }}')" style="cursor: pointer;"><i class="fas fa-download"></i> Document Downloaded</span>
                                                     {% elif item.action == 'download_document' %}
                                                         <span class="badge bg-info"><i class="fas fa-download"></i> Document Downloaded</span>
                                                     {% elif item.action == 'login' %}
@@ -144,7 +146,7 @@
                         {% if documents %}
                             <div class="row">
                                 {% for doc in documents %}
-                                    <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="col-md-6 col-lg-5 mb-4">
                                         <div class="card h-100 shadow-sm">
                                             <div class="card-body">
                                                 <h6 class="card-title">
@@ -156,15 +158,20 @@
                                                     <i class="fas fa-language"></i> {{ doc.language.upper() }}<br>
                                                     <i class="fas fa-tag"></i> {{ doc.document_type.replace('_', ' ').title() }}
                                                 </p>
-                                                <div class="btn-group w-100" role="group">
-                                                    <button class="btn btn-outline-primary btn-sm" onclick="viewDocument('{{ doc.id }}')">
-                                                        <i class="fas fa-eye"></i> View
-                                                    </button>
-                                                    <button class="btn btn-outline-success btn-sm" onclick="downloadDocument('{{ doc.id }}', 'docx')">
-                                                        <i class="fas fa-download"></i> DOCX
-                                                    </button>
-                                                    <button class="btn btn-outline-danger btn-sm" onclick="downloadDocument('{{ doc.id }}', 'pdf')">
-                                                        <i class="fas fa-file-pdf"></i> PDF
+                                                <div class="d-grid gap-2">
+                                                    <div class="btn-group" role="group">
+                                                        <button class="btn btn-outline-primary btn-sm" onclick="viewDocument('{{ doc.id }}')">
+                                                            <i class="fas fa-eye"></i> View
+                                                        </button>
+                                                        <button class="btn btn-outline-success btn-sm" onclick="downloadDocument('{{ doc.id }}', 'docx')">
+                                                            <i class="fas fa-download"></i> DOCX
+                                                        </button>
+                                                        <button class="btn btn-outline-danger btn-sm" onclick="downloadDocument('{{ doc.id }}', 'pdf')">
+                                                            <i class="fas fa-file-pdf"></i> PDF
+                                                        </button>
+                                                    </div>
+                                                    <button class="btn btn-warning btn-sm" onclick="revertDocument('{{ doc.id }}')">
+                                                        <i class="fas fa-undo"></i> Revert to Edit
                                                     </button>
                                                 </div>
                                             </div>
@@ -209,6 +216,29 @@
         function downloadDocument(docId, format) {
             window.location.href = `/api/document/${docId}/download/${format}`;
         }
+        
+        function revertDocument(docId) {
+            console.log('Revert button clicked for document:', docId);
+            if (confirm('Are you sure you want to revert to this document for editing?')) {
+                window.location.href = `/api/document/${docId}/revert`;
+            }
+        }
     </script>
+    <style>
+        .clickable-badge {
+            cursor: pointer !important;
+        }
+        .clickable-badge:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+            transition: all 0.2s ease;
+        }
+        .nav-link {
+            color: black !important;
+        }
+        .navbar .nav-link {
+            color: white !important;
+        }
+    </style>
 </body>
 </html>

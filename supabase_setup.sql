@@ -9,28 +9,28 @@ DROP TABLE IF EXISTS public.generated_documents CASCADE;
 DROP TABLE IF EXISTS public.user_history CASCADE;
 DROP TABLE IF EXISTS public.user_profiles CASCADE;
 
--- Create user_profiles table
+-- Create user_profiles table (no foreign key constraint)
 CREATE TABLE public.user_profiles (
     id SERIAL PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL,
     language_preference TEXT NOT NULL DEFAULT 'en',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create user_history table
+-- Create user_history table (no foreign key constraint)
 CREATE TABLE public.user_history (
     id SERIAL PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL,
     action TEXT NOT NULL,
     details TEXT,
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create generated_documents table
+-- Create generated_documents table (no foreign key constraint)
 CREATE TABLE public.generated_documents (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    user_id UUID NOT NULL,
     document_type TEXT NOT NULL,
     language TEXT DEFAULT 'en',
     title TEXT,
@@ -48,34 +48,10 @@ CREATE INDEX idx_user_history_timestamp ON public.user_history(timestamp);
 CREATE INDEX idx_generated_documents_user_id ON public.generated_documents(user_id);
 CREATE INDEX idx_generated_documents_created_at ON public.generated_documents(created_at);
 
--- Enable Row Level Security (RLS)
-ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.user_history ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.generated_documents ENABLE ROW LEVEL SECURITY;
-
--- RLS Policies for user_profiles table
-CREATE POLICY "Users can view own profile" ON public.user_profiles
-    FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can update own profile" ON public.user_profiles
-    FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own profile" ON public.user_profiles
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-
--- RLS Policies for user_history table
-CREATE POLICY "Users can view own history" ON public.user_history
-    FOR SELECT TO authenticated USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own history" ON public.user_history
-    FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Service role can manage history" ON public.user_history
-    FOR ALL TO service_role USING (true) WITH CHECK (true);
-
--- RLS Policies for generated_documents table
-CREATE POLICY "Users can view own documents" ON public.generated_documents
-    FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own documents" ON public.generated_documents
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Service role can manage documents" ON public.generated_documents
-    FOR ALL TO service_role USING (true) WITH CHECK (true);
+-- Disable Row Level Security for easier development
+ALTER TABLE public.user_profiles DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_history DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.generated_documents DISABLE ROW LEVEL SECURITY;
 
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()

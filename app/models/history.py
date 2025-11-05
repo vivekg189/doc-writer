@@ -27,8 +27,11 @@ def add_user_history(user_id, action, details=None):
             print(f"Skipping history: user_id={user_id}, supabase_client={bool(supabase)}")
             return None
             
+        # Ensure user_id is a string
+        user_id_str = str(user_id)
+        
         data = {
-            'user_id': user_id,
+            'user_id': user_id_str,
             'action': action,
             'details': details,
             'timestamp': datetime.utcnow().isoformat()
@@ -37,11 +40,24 @@ def add_user_history(user_id, action, details=None):
         print(f"Inserting history: {data}")
         response = supabase.table('user_history').insert(data).execute()
         print(f"History insert response: {response.data}")
+        
+        if response.data:
+            print(f"✅ Successfully added history record for user {user_id_str}: {action}")
+        else:
+            print(f"⚠️ History insert returned empty data for user {user_id_str}")
+            
         return response.data
     except Exception as e:
-        print(f"ERROR in add_user_history: {e}")
-        import traceback
-        print(f"Full traceback: {traceback.format_exc()}")
+        error_msg = str(e)
+        if 'violates foreign key constraint' in error_msg and 'users' in error_msg:
+            print(f"❌ ERROR: Users table missing. Please run the SQL setup script first.")
+            print(f"The user_id {user_id} doesn't exist in the users table.")
+        elif 'Could not find the table' in error_msg:
+            print(f"❌ ERROR: Required database tables are missing. Please run the SQL setup script.")
+        else:
+            print(f"❌ ERROR in add_user_history: {e}")
+            import traceback
+            print(f"Full traceback: {traceback.format_exc()}")
         return None
 
 def get_user_history(user_id, limit=50):

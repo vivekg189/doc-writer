@@ -8,9 +8,10 @@ from google.auth.transport import requests
 
 from . import auth_bp
 from app.models.users import get_user, get_user_by_email, add_user_profile, get_user_profile
+from app.models.history import add_user_history
 
 SUPABASE_URL = os.getenv('SUPABASE_URL')
-SUPABASE_KEY = os.getenv('SUPABASE_KEY')  # Use service role key for server-side operations
+SUPABASE_KEY = os.getenv('SUPABASE_SERVICE_KEY') or os.getenv('SUPABASE_KEY')  # Use service role key for server-side operations
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -54,7 +55,12 @@ def api_signup():
 
         if response.user:
             # Create user profile
-            add_user_profile(response.user.id)
+            add_user_profile(response.user.id, response.user.email, response.user.email.split('@')[0])
+
+            # Log signup activity
+            print(f"DEBUG: About to log signup history for user {response.user.id}")
+            history_result = add_user_history(response.user.id, 'signup', f'New account created with email: {response.user.email}')
+            print(f"DEBUG: Signup history result: {history_result}")
 
             return jsonify({
                 'message': 'Account created successfully!',
@@ -101,12 +107,17 @@ def api_login():
             # Get or create user profile
             profile = get_user_profile(response.user.id)
             if not profile:
-                add_user_profile(response.user.id)
+                add_user_profile(response.user.id, response.user.email, response.user.email.split('@')[0])
 
             # Store user data in session
             session['user_id'] = response.user.id
             session['user_email'] = response.user.email
             session['user_username'] = response.user.email.split('@')[0]  # Use email prefix as username
+
+            # Log login activity
+            print(f"DEBUG: About to log login history for user {response.user.id}")
+            history_result = add_user_history(response.user.id, 'login', f'User logged in with email: {response.user.email}')
+            print(f"DEBUG: Login history result: {history_result}")
 
             return jsonify({
                 'message': 'Login successful',
@@ -173,12 +184,17 @@ def api_google_login():
             # Get or create user profile
             profile = get_user_profile(response.user.id)
             if not profile:
-                add_user_profile(response.user.id)
+                add_user_profile(response.user.id, response.user.email, name or response.user.email.split('@')[0])
             
             # Store user data in session
             session['user_id'] = response.user.id
             session['user_email'] = response.user.email
             session['user_username'] = name or response.user.email.split('@')[0]
+            
+            # Log Google login activity
+            print(f"DEBUG: About to log Google login history for user {response.user.id}")
+            history_result = add_user_history(response.user.id, 'login', f'User logged in with Google: {response.user.email}')
+            print(f"DEBUG: Google login history result: {history_result}")
             
             return jsonify({
                 'success': True,
@@ -230,12 +246,17 @@ def api_google_signup():
         
         if response.user:
             # Create user profile
-            add_user_profile(response.user.id)
+            add_user_profile(response.user.id, response.user.email, name or response.user.email.split('@')[0])
             
             # Store user data in session
             session['user_id'] = response.user.id
             session['user_email'] = response.user.email
             session['user_username'] = name or response.user.email.split('@')[0]
+            
+            # Log Google signup activity
+            print(f"DEBUG: About to log Google signup history for user {response.user.id}")
+            history_result = add_user_history(response.user.id, 'signup', f'New account created with Google: {response.user.email}')
+            print(f"DEBUG: Google signup history result: {history_result}")
             
             return jsonify({
                 'success': True,

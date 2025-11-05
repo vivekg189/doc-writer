@@ -5,13 +5,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SUPABASE_URL = os.getenv('SUPABASE_URL')
-SUPABASE_KEY = os.getenv('SUPABASE_KEY')
+SUPABASE_SERVICE_KEY = os.getenv('SUPABASE_SERVICE_KEY') or os.getenv('SUPABASE_KEY')
 
-# Initialize Supabase client only if credentials are provided
+# Initialize Supabase client with service key for server-side operations
 supabase = None
-if SUPABASE_URL and SUPABASE_KEY and SUPABASE_URL != 'your_supabase_url_here':
+if SUPABASE_URL and SUPABASE_SERVICE_KEY and SUPABASE_URL != 'your_supabase_url_here':
     try:
-        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
     except Exception as e:
         print(f"Failed to initialize Supabase client: {e}")
         supabase = None
@@ -20,12 +20,12 @@ def get_user(user_id):
     if not supabase:
         return None
     try:
-        # Get user from Supabase Auth
-        response = supabase.auth.admin.get_user_by_id(user_id)
-        if response.user:
-            return response.user
+        # Get from auth user
+        auth_response = supabase.auth.admin.get_user_by_id(user_id)
+        if auth_response.user:
+            return auth_response.user
     except Exception as e:
-        print(f"Supabase connection error in get_user: {e}")
+        print(f"Error in get_user: {e}")
     return None
 
 def get_user_by_email(email):
@@ -41,23 +41,23 @@ def get_user_by_email(email):
         print(f"Supabase connection error in get_user_by_email: {e}")
     return None
 
-def add_user_profile(user_id, language_preference='en'):
+def add_user_profile(user_id, email=None, username=None):
     if not supabase:
         return None
     try:
-        # First check if user profile already exists
-        existing_profile = get_user_profile(user_id)
-        if existing_profile:
-            return existing_profile
+        # Check if user already exists in user_profiles table
+        existing_user = get_user_profile(user_id)
+        if existing_user:
+            return existing_user
 
         data = {
             'user_id': user_id,
-            'language_preference': language_preference
+            'language_preference': 'en'
         }
         response = supabase.table('user_profiles').insert(data).execute()
         return response.data
     except Exception as e:
-        print(f"Supabase connection error in add_user_profile: {e}")
+        print(f"Error in add_user_profile: {e}")
         return None
 
 def get_user_profile(user_id):
@@ -68,7 +68,7 @@ def get_user_profile(user_id):
         if response.data:
             return response.data[0]
     except Exception as e:
-        print(f"Supabase connection error in get_user_profile: {e}")
+        print(f"Error in get_user_profile: {e}")
     return None
 
 def get_user_from_session(session):

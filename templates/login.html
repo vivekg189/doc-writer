@@ -19,49 +19,34 @@
             position: relative;
         }
         .login-card {
-            background: white;
-            border: 1px solid #e5e7eb;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
             border-radius: 25px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1), 0 0 20px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
             overflow: hidden;
-            animation: cardFloat 0.8s ease-out, glow 3s ease-in-out infinite alternate;
+            animation: slideUp 0.8s ease-out;
             position: relative;
-        }
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+            z-index: 1;
+            max-width: 450px;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            animation: shimmer 2s infinite;
         }
-        @keyframes cardFloat {
+        @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(50px) scale(0.9);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0);
             }
         }
-        @keyframes glow {
-            from { box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1), 0 0 20px rgba(102, 126, 234, 0.1); }
-            to { box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1), 0 0 40px rgba(102, 126, 234, 0.2); }
-        }
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
         .login-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: linear-gradient(135deg, #4285f4 0%, #1976d2 100%);
             color: white;
-            padding: 2.5rem;
+            padding: 3rem 2rem 2rem;
             text-align: center;
             position: relative;
-            overflow: hidden;
         }
         .login-header::before {
             content: '';
@@ -70,60 +55,50 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            animation: rotate 10s linear infinite;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
         }
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
         }
         .login-header h4 {
             margin: 0;
             font-weight: 700;
-            font-size: 2rem;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            animation: textGlow 2s ease-in-out infinite alternate;
-        }
-        @keyframes textGlow {
-            from { text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
-            to { text-shadow: 0 2px 20px rgba(255, 255, 255, 0.5); }
+            font-size: 1.8rem;
+            position: relative;
+            z-index: 1;
         }
         .login-header p {
             margin: 0.5rem 0 0 0;
-            opacity: 0.95;
+            opacity: 0.9;
             font-size: 1rem;
-            font-weight: 300;
+            position: relative;
+            z-index: 1;
         }
         .form-control {
-            border: 2px solid #e5e7eb;
-            border-radius: 15px;
-            padding: 1rem 1.25rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
             font-size: 1rem;
-            background: white;
-            color: #333;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
         }
         .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2), 0 0 20px rgba(102, 126, 234, 0.3);
-            background: white;
-            transform: translateY(-2px);
-        }
-        .form-control::placeholder {
-            color: rgba(0, 0, 0, 0.5);
+            border-color: #4285f4;
+            box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.15);
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-1px);
         }
         .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: linear-gradient(135deg, #4285f4 0%, #1976d2 100%);
             border: none;
-            border-radius: 15px;
-            padding: 1rem 2.5rem;
-            font-weight: 700;
-            font-size: 1.1rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px;
+            padding: 0.9rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
         .btn-login::before {
             content: '';
@@ -132,104 +107,69 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
             transition: left 0.5s;
         }
         .btn-login:hover::before {
             left: 100%;
         }
         .btn-login:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4), 0 0 30px rgba(240, 147, 251, 0.3);
-        }
-        .btn-login:active {
-            transform: translateY(-1px) scale(1.02);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 85, 104, 0.3);
         }
         .login-footer {
             background: #f8fafc;
-            padding: 2rem;
+            padding: 1.5rem;
             text-align: center;
-            border-top: 1px solid #e5e7eb;
         }
         .login-footer a {
-            color: #667eea;
+            color: #4a5568;
             text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .login-footer a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #667eea, #f093fb);
-            transition: width 0.3s ease;
-        }
-        .login-footer a:hover::after {
-            width: 100%;
+            font-weight: 500;
         }
         .login-footer a:hover {
-            color: #f093fb;
-            transform: translateY(-1px);
+            color: #2d3748;
         }
         .input-group-text {
-            background: #f8fafc;
-            border: 2px solid #e5e7eb;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 2px solid #e2e8f0;
             border-right: none;
-            color: #6b7280;
-            border-radius: 15px 0 0 15px;
+            color: #4285f4;
+            border-radius: 12px 0 0 12px;
+            font-size: 1.1rem;
         }
         .alert {
-            border-radius: 15px;
+            border-radius: 10px;
             border: none;
-            backdrop-filter: blur(10px);
-            animation: alertSlide 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes alertSlide {
-            from {
-                opacity: 0;
-                transform: translateX(-30px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
         }
         .loading {
             display: none;
         }
-        .spinner-border-sm {
-            width: 1rem;
-            height: 1rem;
-        }
-        .btn-outline-danger {
-            border: 2px solid #ff6b6b;
-            border-radius: 15px;
-            padding: 1rem 2.5rem;
-            font-weight: 600;
-            background: rgba(255, 107, 107, 0.1);
-            backdrop-filter: blur(10px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-outline-danger:hover {
-            background: #ff6b6b;
-            border-color: #ff6b6b;
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
-        }
         .card-body {
-            padding: 3rem;
+            padding: 2rem;
+        }
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.9rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #374151;
         }
-        .fas {
-            animation: iconPulse 2s ease-in-out infinite;
+        .google-btn:hover {
+            border-color: #4285f4;
+            box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.1);
+            transform: translateY(-1px);
         }
-        @keyframes iconPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        .google-btn img {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
         }
     </style>
 </head>
@@ -259,9 +199,16 @@
 
                     <div class="card login-card">
                         <div class="login-header">
-                            <i class="fas fa-sign-in-alt fa-2x mb-3"></i>
-                            <h4>Welcome Back</h4>
-                            <p>Sign in to your account</p>
+                            <div class="mb-3" style="position: relative; z-index: 1;">
+                                <i class="fas fa-gavel fa-3x mb-2" style="color: rgba(255,255,255,0.9);"></i>
+                                <div class="mt-2">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    <i class="fas fa-file-contract me-2"></i>
+                                    <i class="fas fa-balance-scale"></i>
+                                </div>
+                            </div>
+                            <h4>Legal Document Portal</h4>
+                            <p>Secure access to your legal document generator</p>
                         </div>
                         <div class="card-body p-4">
                             <form id="loginForm">
@@ -297,6 +244,10 @@
                                 </div>
                                 <div class="d-grid">
                                     <div id="googleLoginBtn"></div>
+                                    <button type="button" class="google-btn" id="customGoogleBtn" style="display: none;">
+                                        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
+                                        Sign in with Google
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -353,95 +304,99 @@
                     });
                     google.accounts.id.renderButton(
                         document.getElementById('googleLoginBtn'),
-                        { theme: 'outline', size: 'large', width: '100%' }
+                        { 
+                            theme: 'outline', 
+                            size: 'large', 
+                            width: '100%',
+                            text: 'signin_with',
+                            shape: 'rectangular'
+                        }
                     );
                 } catch (error) {
                     console.log('Google Sign-In not available:', error);
                     document.getElementById('googleLoginBtn').style.display = 'none';
+                    document.getElementById('customGoogleBtn').style.display = 'flex';
                 }
             } else {
                 document.getElementById('googleLoginBtn').style.display = 'none';
+                document.getElementById('customGoogleBtn').style.display = 'none';
             }
         };
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            const loginBtn = document.getElementById('loginBtn');
-            const btnText = loginBtn.querySelector('.btn-text');
-            const loading = loginBtn.querySelector('.loading');
-            const colMd5 = document.querySelector('.col-md-5');
-            const card = document.querySelector('.card');
-
-            // Clear previous alerts
-            const existingAlerts = colMd5.querySelectorAll('.alert');
+        
+        document.getElementById('customGoogleBtn').addEventListener('click', function() {
+            alert('Google Sign-In is not configured properly.');
+        });
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const btnText = loginBtn.querySelector('.btn-text');
+        const loading = loginBtn.querySelector('.loading');
+        const container = document.querySelector('.col-md-5');
+        const card = document.querySelector('.card');
+        
+        function showAlert(message, type = 'danger') {
+            const existingAlerts = container.querySelectorAll('.alert');
             existingAlerts.forEach(alert => alert.remove());
-
-            // Client-side validation
-            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            if (!emailPattern.test(email)) {
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
-                errorAlert.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>Please enter a valid email address
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-                colMd5.insertBefore(errorAlert, card);
+            
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show mt-3`;
+            alert.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+            container.insertBefore(alert, card);
+        }
+        
+        function toggleLoading(show) {
+            btnText.style.display = show ? 'none' : 'inline';
+            loading.style.display = show ? 'inline' : 'none';
+            loginBtn.disabled = show;
+        }
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showAlert('Please enter a valid email address');
                 return;
             }
-
+            
             if (!password) {
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
-                errorAlert.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>Please enter your password
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-                colMd5.insertBefore(errorAlert, card);
+                showAlert('Please enter your password');
                 return;
             }
-
-            // Show loading state
-            btnText.style.display = 'none';
-            loading.style.display = 'inline';
-            loginBtn.disabled = true;
-
+            
+            toggleLoading(true);
+            
             try {
                 const response = await fetch('/auth/api/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
-
+                
                 const data = await response.json();
-
+                
                 if (response.ok) {
-                    // Login successful, redirect
                     window.location.href = '/';
                 } else {
-                    throw new Error(data.error || 'An unexpected error occurred during login.');
+                    showAlert(data.error || 'Login failed');
                 }
-
             } catch (error) {
-                console.error('Login error:', error);
-                // Show error message
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
-                errorAlert.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>${error.message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-                colMd5.insertBefore(errorAlert, card);
+                showAlert('Network error. Please try again.');
             } finally {
-                // Hide loading state
-                btnText.style.display = 'inline';
-                loading.style.display = 'none';
-                loginBtn.disabled = false;
+                toggleLoading(false);
             }
         });
+        
+        // Style the Google button after it loads
+        setTimeout(function() {
+            const googleBtn = document.querySelector('#googleLoginBtn iframe');
+            if (googleBtn) {
+                googleBtn.style.borderRadius = '12px';
+            }
+        }, 1000);
     </script>
 </body>
 </html>

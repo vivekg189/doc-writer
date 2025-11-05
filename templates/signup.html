@@ -65,7 +65,7 @@
             100% { left: 100%; }
         }
         .signup-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: linear-gradient(135deg, #4285f4 0%, #1976d2 50%, #42a5f5 100%);
             color: white;
             padding: 2.5rem;
             text-align: center;
@@ -113,8 +113,8 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2), 0 0 20px rgba(102, 126, 234, 0.3);
+            border-color: #4285f4;
+            box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.2), 0 0 20px rgba(66, 133, 244, 0.3);
             background: white;
             transform: translateY(-2px);
         }
@@ -122,7 +122,7 @@
             color: rgba(0, 0, 0, 0.5);
         }
         .btn-signup {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: linear-gradient(135deg, #4285f4 0%, #1976d2 50%, #42a5f5 100%);
             border: none;
             border-radius: 15px;
             padding: 1rem 2.5rem;
@@ -149,7 +149,7 @@
         }
         .btn-signup:hover {
             transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4), 0 0 30px rgba(240, 147, 251, 0.3);
+            box-shadow: 0 15px 35px rgba(66, 133, 244, 0.4), 0 0 30px rgba(66, 165, 245, 0.3);
         }
         .btn-signup:active {
             transform: translateY(-1px) scale(1.02);
@@ -161,7 +161,7 @@
             border-top: 1px solid #e5e7eb;
         }
         .signup-footer a {
-            color: #667eea;
+            color: #4285f4;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
@@ -174,14 +174,14 @@
             left: 0;
             width: 0;
             height: 2px;
-            background: linear-gradient(90deg, #667eea, #f093fb);
+            background: linear-gradient(90deg, #4285f4, #42a5f5);
             transition: width 0.3s ease;
         }
         .signup-footer a:hover::after {
             width: 100%;
         }
         .signup-footer a:hover {
-            color: #f093fb;
+            color: #42a5f5;
             transform: translateY(-1px);
         }
         .input-group-text {
@@ -246,6 +246,29 @@
         @keyframes iconPulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
+        }
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #374151;
+        }
+        .google-btn:hover {
+            border-color: #4285f4;
+            box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.1);
+            transform: translateY(-1px);
+        }
+        .google-btn img {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
         }
     </style>
 </head>
@@ -326,6 +349,10 @@
                                 </div>
                                 <div class="d-grid">
                                     <div id="googleSignupBtn"></div>
+                                    <button type="button" class="google-btn" id="customGoogleSignupBtn" style="display: none;">
+                                        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
+                                        Sign up with Google
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -382,16 +409,28 @@
                     });
                     google.accounts.id.renderButton(
                         document.getElementById('googleSignupBtn'),
-                        { theme: 'outline', size: 'large', width: '100%' }
+                        { 
+                            theme: 'outline', 
+                            size: 'large', 
+                            width: '100%',
+                            text: 'signup_with',
+                            shape: 'rectangular'
+                        }
                     );
                 } catch (error) {
                     console.log('Google Sign-In not available:', error);
                     document.getElementById('googleSignupBtn').style.display = 'none';
+                    document.getElementById('customGoogleSignupBtn').style.display = 'flex';
                 }
             } else {
                 document.getElementById('googleSignupBtn').style.display = 'none';
+                document.getElementById('customGoogleSignupBtn').style.display = 'none';
             }
         };
+        
+        document.getElementById('customGoogleSignupBtn').addEventListener('click', function() {
+            alert('Google Sign-Up is not configured properly.');
+        });
         // Password strength checker
         document.getElementById('password').addEventListener('input', function() {
             const password = this.value;
@@ -534,6 +573,14 @@
                 signupBtn.disabled = false;
             }
         });
+        
+        // Style the Google button after it loads
+        setTimeout(function() {
+            const googleBtn = document.querySelector('#googleSignupBtn iframe');
+            if (googleBtn) {
+                googleBtn.style.borderRadius = '15px';
+            }
+        }, 1000);
     </script>
 </body>
 </html>

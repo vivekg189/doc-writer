@@ -48,6 +48,34 @@
         </div>
     </nav>
 
+    <!-- Hero Section -->
+    <div class="bg-white py-5">
+        <div class="container text-center">
+            <h1 class="display-4 mb-3 text-primary"><i class="fas fa-gavel me-3"></i>Legal Document Generator</h1>
+            <p class="lead mb-4 text-muted">Professional Legal Documents Made Simple</p>
+            
+            <div class="row justify-content-center mb-5">
+                <div class="col-lg-8">
+                    <h3 class="mb-3 text-dark">Transform Your Ideas Into Legal Documents</h3>
+                    <p class="fs-5 text-muted">Simply describe what you need in plain English, and our intelligent system will create a professional, legally-compliant document tailored to your specific requirements.</p>
+                </div>
+            </div>
+            
+            <div class="row text-center justify-content-center">
+                <div class="col-md-6 mb-3">
+                    <i class="fas fa-language fa-3x mb-3 text-success"></i>
+                    <h5 class="text-dark">Multi-Language Support</h5>
+                    <p class="mb-0 text-muted">Available in English, Hindi, and 8+ regional languages</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <i class="fas fa-download fa-3x mb-3 text-info"></i>
+                    <h5 class="text-dark">Multiple Formats</h5>
+                    <p class="mb-0 text-muted">Download as DOCX, PDF, or view as HTML</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container mt-5">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
@@ -63,11 +91,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card fade-in">
-                    <div class="card-header">
-                        <h4 class="mb-0">Generate Legal Document</h4>
-                    </div>
                     <div class="card-body">
-                        <p class="text-muted mb-3">Describe the legal document you want to generate in natural language. Include details like parties involved, amounts, dates, and locations.</p>
 <form method="POST" action="{{ url_for('document.generate_from_prompt') }}">
                             <div class="mb-3 d-flex align-items-center">
                                 <label for="prompt" class="form-label me-3 mb-0 flex-shrink-0">Document Description</label>
@@ -85,13 +109,19 @@
 
         <hr class="my-5">
 
-        <h3 class="mb-4 text-center">Or Select Document Type</h3>
+        <div class="text-center mb-5">
+            <h3 class="text-primary mb-3">Quick Start Templates</h3>
+            <p class="text-muted">Choose from our most popular document types for faster generation</p>
+        </div>
         <div class="row" id="documentTypes">
             <div class="col-md-6 mb-4">
                 <div class="card fade-in">
                     <div class="card-body">
-                        <h5 class="card-title">Rental Agreement</h5>
-                        <p class="card-text">Generate a standard rental agreement with customizable terms.</p>
+                        <div class="text-center mb-3">
+                            <i class="fas fa-home fa-3x text-primary mb-2"></i>
+                        </div>
+                        <h5 class="card-title text-center">Rental Agreement</h5>
+                        <p class="card-text text-center">Create comprehensive rental agreements with tenant protection, rent terms, and legal compliance for residential properties.</p>
                         <a href="{{ url_for('document.document_form', doc_type='rental_agreement') }}" class="btn btn-outline-primary">Generate</a>
                     </div>
                 </div>
@@ -99,8 +129,11 @@
             <div class="col-md-6 mb-4">
                 <div class="card fade-in">
                     <div class="card-body">
-                        <h5 class="card-title">Land Sale Deed</h5>
-                        <p class="card-text">Create a land sale deed with property and party details.</p>
+                        <div class="text-center mb-3">
+                            <i class="fas fa-map-marked-alt fa-3x text-success mb-2"></i>
+                        </div>
+                        <h5 class="card-title text-center">Land Sale Deed</h5>
+                        <p class="card-text text-center">Generate legally binding property sale deeds with clear ownership transfer, payment terms, and registration-ready documentation.</p>
                         <a href="{{ url_for('document.document_form', doc_type='land_sale_deed') }}" class="btn btn-outline-primary">Generate</a>
                     </div>
                 </div>
@@ -108,8 +141,11 @@
             <div class="col-md-6 mb-4">
                 <div class="card fade-in">
                     <div class="card-body">
-                        <h5 class="card-title">Power of Attorney</h5>
-                        <p class="card-text">Draft a power of attorney document with customizable authority scope.</p>
+                        <div class="text-center mb-3">
+                            <i class="fas fa-user-tie fa-3x text-warning mb-2"></i>
+                        </div>
+                        <h5 class="card-title text-center">Power of Attorney</h5>
+                        <p class="card-text text-center">Draft comprehensive power of attorney documents with specific authority delegation, time limits, and revocation clauses.</p>
                         <a href="{{ url_for('document.document_form', doc_type='power_of_attorney') }}" class="btn btn-outline-primary">Generate</a>
                     </div>
                 </div>
@@ -117,8 +153,11 @@
             <div class="col-md-6 mb-4">
                 <div class="card fade-in">
                     <div class="card-body">
-                        <h5 class="card-title">House Lease</h5>
-                        <p class="card-text">Generate a house lease agreement with detailed terms.</p>
+                        <div class="text-center mb-3">
+                            <i class="fas fa-building fa-3x text-info mb-2"></i>
+                        </div>
+                        <h5 class="card-title text-center">House Lease</h5>
+                        <p class="card-text text-center">Generate detailed house lease agreements with maintenance clauses, security deposits, and tenant-landlord responsibilities.</p>
                         <a href="{{ url_for('document.document_form', doc_type='house_lease') }}" class="btn btn-outline-primary">Generate</a>
                     </div>
                 </div>

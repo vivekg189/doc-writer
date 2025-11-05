@@ -550,17 +550,19 @@ def generate_document():
 
         # Log history and save document
         print(f"DEBUG: Session contents: {dict(session)}")
+        print(f"DEBUG: Session keys: {list(session.keys())}")
         if 'user_id' in session:
-            print(f"DEBUG: Found user_id in session: {session['user_id']}")
+            user_id = session['user_id']
+            print(f"DEBUG: Found user_id in session: {user_id} (type: {type(user_id)})")
             
             # Add to history
-            result = add_user_history(session['user_id'], 'generate_document', f'Generated {doc_type} in {language}')
+            result = add_user_history(user_id, 'generate_document', f'Generated {doc_type} in {language}')
             print(f"DEBUG: History add result: {result}")
             
             # Save generated document
             title = f"{doc_type.replace('_', ' ').title()} - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
             doc_result = save_generated_document(
-                session['user_id'], 
+                user_id, 
                 doc_type, 
                 language, 
                 title, 
@@ -570,6 +572,7 @@ def generate_document():
             print(f"DEBUG: Document save result: {doc_result}")
         else:
             print("DEBUG: No user_id found in session - user not logged in")
+            print(f"DEBUG: Available session data: {dict(session)}")
 
         return render_template('view_document.html', doc_type=doc_type, content=document, entities=entities)
     except Exception as e:
@@ -609,20 +612,28 @@ def generate_from_prompt():
         extracted_entities = [(ent.text, ent.label_) for ent in doc_nlp.ents]
 
         # Log history and save document
+        print(f"DEBUG PROMPT: Session contents: {dict(session)}")
         if 'user_id' in session:
+            user_id = session['user_id']
+            print(f"DEBUG PROMPT: Found user_id in session: {user_id}")
+            
             # Add to history
-            add_user_history(session['user_id'], 'generate_from_prompt', f'Generated {doc_type} from prompt in {language}')
+            result = add_user_history(user_id, 'generate_from_prompt', f'Generated {doc_type} from prompt in {language}')
+            print(f"DEBUG PROMPT: History add result: {result}")
             
             # Save generated document
             title = f"{doc_type.replace('_', ' ').title()} from Prompt - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
-            save_generated_document(
-                session['user_id'], 
+            doc_result = save_generated_document(
+                user_id, 
                 doc_type, 
                 language, 
                 title, 
                 document, 
                 entities  # Save the extracted entities
             )
+            print(f"DEBUG PROMPT: Document save result: {doc_result}")
+        else:
+            print("DEBUG PROMPT: No user_id found in session - user not logged in")
 
         flash(f'Document type classified as: {doc_type.replace("_", " ").title()}', 'success')
         return render_template('view_document.html', doc_type=doc_type, content=document, entities=extracted_entities, prompt=prompt)
@@ -704,22 +715,25 @@ def api_generate_document():
         # Log history and save document
         print(f"DEBUG API: Session contents: {dict(session)}")
         if 'user_id' in session:
-            print(f"DEBUG API: Found user_id in session: {session['user_id']}")
+            user_id = session['user_id']
+            print(f"DEBUG API: Found user_id in session: {user_id}")
             
             # Add to history
-            add_user_history(session['user_id'], 'download_document', f'Downloaded {doc_type} as {format_type} in {language}')
+            result = add_user_history(user_id, 'download_document', f'Downloaded {doc_type} as {format_type} in {language}')
+            print(f"DEBUG API: History add result: {result}")
             
             # Save generated document if not already saved
             if 'content' not in filled_data:  # Only save if it's a new generation
                 title = f"{doc_type.replace('_', ' ').title()} - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
-                save_generated_document(
-                    session['user_id'], 
+                doc_result = save_generated_document(
+                    user_id, 
                     doc_type, 
                     language, 
                     title, 
                     document_content, 
                     filled_data
                 )
+                print(f"DEBUG API: Document save result: {doc_result}")
         else:
             print("DEBUG API: No user_id found in session - user not logged in")
         
@@ -874,7 +888,8 @@ def api_download_document(doc_id, format):
         document = response.data[0]
         
         # Log download activity
-        add_user_history(session['user_id'], 'download_saved_document', f'Downloaded saved {document["document_type"]} as {format}')
+        result = add_user_history(session['user_id'], 'download_saved_document', f'Downloaded saved {document["document_type"]} as {format}')
+        print(f"DEBUG DOWNLOAD: History add result: {result}")
         
         # Create file based on format
         if format == 'docx':

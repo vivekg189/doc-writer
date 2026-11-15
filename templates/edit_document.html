@@ -3,41 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit {{ doc_type|title|replace('_', ' ') }} - Legal Document Generator</title>
+    <title>Edit {{ doc_type|title|replace('_', ' ') }} - Legal Document Workspace</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Style System -->
+    <link href="{{ url_for('static', filename='css/style.css') }}?v=2.3" rel="stylesheet">
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">Legal Document Generator</a>
+<body class="doc-workspace-bg">
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg custom-navbar shadow-sm sticky-top no-print">
+        <div class="container-fluid px-3 px-lg-4 px-xl-5">
+            <a class="navbar-brand navbar-brand-custom" href="{{ url_for('main.index') }}">
+                <span class="brand-icon-wrapper">
+                    <i class="fas fa-gavel"></i>
+                </span>
+                <span>Legal Document Generator</span>
+            </a>
+            
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <a href="{{ url_for('main.index') }}" class="btn-nav-history">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Home
+                </a>
+            </div>
         </div>
     </nav>
 
-    <div class="container mt-5 fade-in">
-        <div class="row justify-content-center">
-            <div class="col-md-10">
-                <div class="card bounce-in">
-                    <div class="card-header">
-                        <h4 class="mb-0">Edit {{ doc_type|title|replace('_', ' ') }}</h4>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="{{ url_for('document.edit_document') }}">
-                            <input type="hidden" name="doc_type" value="{{ doc_type }}">
-                            <div class="mb-3 form-group">
-                                <label for="edited_content" class="form-label">Document Content</label>
-                                <textarea class="form-control" id="edited_content" name="edited_content" rows="20">{{ content }}</textarea>
+    <!-- Main Workspace Container -->
+    <main class="doc-workspace-container py-5">
+        <div class="container-xl px-3 px-md-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-9">
+                    
+                    <!-- Document Info Header -->
+                    <div class="doc-info-header-card mb-4">
+                        <div class="doc-info-left">
+                            <div class="doc-icon-badge">
+                                <i class="fas fa-pen-to-square"></i>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">Cancel</a>
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <div>
+                                <h1 class="doc-title-main">Edit {{ doc_type|title|replace('_', ' ') }}</h1>
+                                <p class="doc-breadcrumbs">
+                                    <a href="{{ url_for('main.index') }}"><i class="fas fa-house me-1"></i> Home</a>
+                                    <span class="mx-1 text-muted">/</span>
+                                    <span>Workspace</span>
+                                    <span class="mx-1 text-muted">/</span>
+                                    <span class="text-dark fw-semibold">Edit Document</span>
+                                </p>
                             </div>
-                        </form>
+                        </div>
                     </div>
+
+                    <!-- Editor Card -->
+                    <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+                        <div class="card-header bg-white border-bottom p-3 p-md-4">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1">
+                                        <i class="fas fa-code-compare me-1"></i> Full Document Source
+                                    </span>
+                                    <span class="text-muted small">Update and save clauses below</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4 p-md-5 bg-white">
+                            <form method="POST" action="{{ url_for('document.edit_document') }}">
+                                <input type="hidden" name="doc_type" value="{{ doc_type }}">
+                                
+                                <div class="mb-4">
+                                    <label for="edited_content" class="auth-label fw-bold mb-2 d-flex align-items-center gap-2">
+                                        <i class="fas fa-align-left text-primary"></i> Legal Agreement Text
+                                    </label>
+                                    <textarea class="form-control font-monospace p-3 rounded-3" 
+                                              id="edited_content" 
+                                              name="edited_content" 
+                                              rows="22" 
+                                              style="font-size: 0.95rem; line-height: 1.7; border-color: #cbd5e1;">{{ content }}</textarea>
+                                </div>
+
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-2 border-top">
+                                    <a href="{{ url_for('main.index') }}" class="btn-doc-tool btn-doc-secondary">
+                                        <i class="fas fa-arrow-left"></i>
+                                        <span>Cancel</span>
+                                    </a>
+                                    <button type="submit" class="btn-doc-tool btn-doc-success">
+                                        <i class="fas fa-check"></i>
+                                        <span>Save Changes</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

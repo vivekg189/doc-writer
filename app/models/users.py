@@ -38,10 +38,11 @@ def add_user_profile(user_id, language_preference='en'):
             return existing_profile
 
         data = {
-            'user_id': user_id,
+            'id': user_id,
             'language_preference': language_preference
         }
-        response = supabase.table('user_profiles').insert(data).execute()
+        # Update users table with profile information
+        response = supabase.table('users').upsert(data).execute()
         return response.data
     except Exception as e:
         print(f"Supabase connection error in add_user_profile: {e}")
@@ -49,7 +50,7 @@ def add_user_profile(user_id, language_preference='en'):
 
 def get_user_profile(user_id):
     try:
-        response = supabase.table('user_profiles').select('*').eq('user_id', user_id).execute()
+        response = supabase.table('users').select('*').eq('id', user_id).execute()
         if response.data:
             return response.data[0]
     except Exception as e:

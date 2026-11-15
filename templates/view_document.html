@@ -3,216 +3,522 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ doc_type|title|replace('_', ' ') }} - Legal Document Generator</title>
+    <title>{{ doc_type|title|replace('_', ' ') }} - Legal Document Workspace</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"> <!-- Font Awesome for icons -->
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Style System -->
+    <link href="{{ url_for('static', filename='css/style.css') }}?v=2.3" rel="stylesheet">
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary no-print">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">Legal Document Generator</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+<body class="doc-workspace-bg">
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg custom-navbar shadow-sm sticky-top no-print">
+        <div class="container-fluid px-3 px-lg-4 px-xl-5">
+            <a class="navbar-brand navbar-brand-custom" href="{{ url_for('main.index') }}">
+                <span class="brand-icon-wrapper">
+                    <i class="fas fa-gavel"></i>
+                </span>
+                <span>Legal Document Generator</span>
+            </a>
+            
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars text-dark fs-5"></i>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                    <!-- No authentication, so no nav links needed -->
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="{{ url_for('main.index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="{{ url_for('document.generate_from_prompt') }}">Create Document</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="{{ url_for('main.index') }}#document-types">Document Types</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="{{ url_for('main.index') }}#how-it-works">How It Works</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-2 flex-nowrap">
+                    {% if user %}
+                        <a href="{{ url_for('main.user_history') }}" class="btn-nav-history">
+                            <i class="fas fa-clock-rotate-left"></i>
+                            <span>History</span>
+                        </a>
+
+                        <div class="dropdown user-dropdown">
+                            <button class="user-profile-chip dropdown-toggle" type="button" id="userMenuBtnView" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="user-avatar-circle">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <span class="user-name-text">{{ user.username }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end user-dropdown-panel shadow-sm" aria-labelledby="userMenuBtnView">
+                                <li class="dropdown-header">
+                                    <span class="d-block text-muted small">Signed in as</span>
+                                    <strong class="text-dark">{{ user.username }}</strong>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('main.user_history') }}">
+                                        <i class="fas fa-clock-rotate-left me-2 text-primary"></i> My Documents
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('document.generate_from_prompt') }}">
+                                        <i class="fas fa-wand-magic-sparkles me-2 text-primary"></i> Draft Document
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                                        <i class="fas fa-arrow-right-from-bracket me-2"></i> Log Out
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <a href="{{ url_for('auth.logout') }}" class="btn-nav-logout" title="Log Out">
+                            <i class="fas fa-arrow-right-from-bracket"></i>
+                            <span class="d-none d-sm-inline">Logout</span>
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('main.index') }}" class="btn-nav-history">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Back to Home</span>
+                        </a>
+                        <a href="{{ url_for('auth.login') }}" class="btn-nav-login">
+                            <i class="fas fa-arrow-right-to-bracket"></i>
+                            <span>Login</span>
+                        </a>
+                        <a href="{{ url_for('auth.signup') }}" class="btn-nav-signup">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Sign Up</span>
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-5">
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-info alert-dismissible fade show no-print" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        <div class="row justify-content-center">
-            <div class="col-md-10">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center no-print">
-                        <h4 class="mb-0">{{ doc_type|title|replace('_', ' ') }}</h4>
-                        <div class="btn-toolbar" role="toolbar">
-                            <div class="btn-group me-3" role="group">
-                                <a href="{{ url_for('document.document_form', doc_type=doc_type) }}" class="btn btn-outline-primary rounded-pill">
-                                    <i class="fas fa-edit me-2"></i>Edit Form
-                                </a>
-                                <button id="editDocumentBtn" class="btn btn-secondary rounded-pill">
-                                    <i class="fas fa-pencil-alt me-2"></i>Edit Document
-                                </button>
-                                <button id="saveChangesBtn" class="btn btn-success rounded-pill" style="display:none;">
-                                    <i class="fas fa-save me-2"></i>Save Changes
-                                </button>
-                            </div>
-                            <div class="btn-group" role="group">
-                                <button onclick="downloadAsText()" class="btn btn-warning rounded-pill">
-                                    <i class="far fa-file-alt me-1"></i>TXT
-                                </button>
-                                <button onclick="downloadAsDocx()" class="btn btn-success rounded-pill">
-                                    <i class="far fa-file-word me-1"></i>DOCX
-                                </button>
-                                <button onclick="downloadAsPdf()" class="btn btn-danger rounded-pill">
-                                    <i class="far fa-file-pdf me-1"></i>PDF
-                                </button>
-                            </div>
+    <!-- Main Workspace Container -->
+    <main class="doc-workspace-container">
+        <div class="container-xl px-3 px-md-4">
+            
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'success' if category == 'success' else 'info' }} alert-dismissible fade show shadow-sm mb-3 no-print" role="alert">
+                            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Dynamic Notification Toast Container -->
+            <div id="workspaceAlertContainer" class="no-print"></div>
+
+            <!-- 1. Document Information Header Card -->
+            <div class="doc-info-header-card no-print">
+                <div class="doc-info-left">
+                    <div class="doc-icon-badge">
+                        <i class="fas fa-file-contract"></i>
                     </div>
-                    
-                    <div class="card-body">
-                            <div id="document-content" class="bg-white p-4 print-content" contenteditable="false">
-    <pre id="documentText">{{ content }}</pre>
-                            </div>
-                    </div>
-                    
-                    <div class="card-footer text-end no-print">
-                        <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">Back to Home</a>
+                    <div>
+                        <h1 class="doc-title-main">{{ doc_type|title|replace('_', ' ') }}</h1>
+                        <p class="doc-breadcrumbs">
+                            <a href="{{ url_for('main.index') }}"><i class="fas fa-house me-1"></i> Home</a>
+                            <span class="mx-1 text-muted">/</span>
+                            <span>Document Workspace</span>
+                            <span class="mx-1 text-muted">/</span>
+                            <span class="text-dark fw-semibold">Preview &amp; Export</span>
+                        </p>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
+                <div class="doc-meta-pills">
+                    <span class="doc-meta-pill pill-status">
+                        <i class="fas fa-circle-check"></i>
+                        <span>Draft Ready</span>
+                    </span>
+                    <span class="doc-meta-pill">
+                        <i class="fas fa-language text-primary"></i>
+                        <span>{{ language|title if language else 'English' }}</span>
+                    </span>
+                    <span class="doc-meta-pill">
+                        <i class="fas fa-align-left text-secondary"></i>
+                        <span id="metaWordCount">Calculating...</span>
+                    </span>
+                    <span class="doc-meta-pill d-none d-md-inline-flex">
+                        <i class="fas fa-clock text-secondary"></i>
+                        <span id="metaReadingTime">1 min read</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- 2. Sticky Document Action Toolbar -->
+            <div class="doc-action-toolbar no-print">
+                <!-- Left: Editing Tools -->
+                <div class="toolbar-group">
+                    <a href="{{ url_for('document.document_form', doc_type=doc_type) }}" class="btn-doc-tool btn-doc-secondary" title="Return to form inputs">
+                        <i class="fas fa-sliders-h"></i>
+                        <span>Edit Form</span>
+                    </a>
+                    <button id="editDocumentBtn" class="btn-doc-tool btn-doc-primary" title="Edit document content directly on the page">
+                        <i class="fas fa-pen-to-square"></i>
+                        <span>Edit Document</span>
+                    </button>
+                    <button id="saveChangesBtn" class="btn-doc-tool btn-doc-success" style="display:none;" title="Save edited changes">
+                        <i class="fas fa-check"></i>
+                        <span>Save Changes</span>
+                    </button>
+                    <button id="cancelEditBtn" class="btn-doc-tool btn-doc-danger-outline" style="display:none;" title="Discard unsaved changes">
+                        <i class="fas fa-xmark"></i>
+                        <span>Cancel</span>
+                    </button>
+                    <button id="copyDocBtn" class="btn-doc-tool btn-doc-secondary d-none d-sm-inline-flex" title="Copy text to clipboard">
+                        <i class="far fa-copy"></i>
+                        <span>Copy</span>
+                    </button>
+                </div>
+
+                <!-- Right: Download & Export Tools -->
+                <div class="toolbar-group">
+                    <button id="btnDownloadTxt" onclick="downloadAsText()" class="btn-doc-tool btn-doc-txt" title="Export as plain text (.txt)">
+                        <i class="far fa-file-alt"></i>
+                        <span>TXT</span>
+                    </button>
+                    <button id="btnDownloadDocx" onclick="downloadAsDocx()" class="btn-doc-tool btn-doc-docx" title="Export as Microsoft Word (.docx)">
+                        <i class="far fa-file-word"></i>
+                        <span>DOCX</span>
+                    </button>
+                    <button id="btnDownloadPdf" onclick="downloadAsPdf()" class="btn-doc-tool btn-doc-pdf" title="Export as Adobe PDF (.pdf)">
+                        <i class="far fa-file-pdf"></i>
+                        <span>PDF</span>
+                    </button>
+                    <button onclick="window.print()" class="btn-doc-tool btn-doc-print d-none d-md-inline-flex" title="Print document">
+                        <i class="fas fa-print"></i>
+                        <span>Print</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. Edit Mode Notice Banner -->
+            <div id="editAlertBanner" class="doc-edit-alert no-print">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-pen-nib fs-5"></i>
+                        <div>
+                            <strong>Live Document Editing Active:</strong>
+                            <span>You can click and type directly on the legal paper below. Click <strong>Save Changes</strong> to apply or <strong>Cancel</strong> to discard.</span>
+                        </div>
+                    </div>
+                    <span class="badge bg-primary">In-Place Editor</span>
+                </div>
+            </div>
+
+            <!-- 4. Centered A4 Document Paper Preview -->
+            <div class="doc-paper-wrapper" id="docPaperWrapper">
+                <!-- Top Decorative Luxury Header Strip -->
+                <div class="doc-paper-header-strip"></div>
+
+                <!-- The Physical Paper Sheet -->
+                <div class="doc-paper-sheet" id="document-content">
+                    <!-- Ground-truth text container: strictly pre-wrap, word-break normal, zero overflow -->
+                    <div id="documentText" class="legal-document-content" contenteditable="false" spellcheck="true">{{ content }}</div>
+                </div>
+            </div>
+
+            <!-- Hidden Backup Ground Truth for Rollback -->
+            <textarea id="rawOriginalContent" style="display:none;" aria-hidden="true">{{ content }}</textarea>
+
+            <!-- 5. Bottom Navigation Bar -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 pt-2 no-print">
+                <a href="{{ url_for('main.index') }}" class="btn-doc-tool btn-doc-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Home</span>
+                </a>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('document.generate_from_prompt') }}" class="btn-doc-tool btn-doc-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>Generate Another Document</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Document Actions & Editing Logic -->
     <script>
-    function downloadAsText() {
-        const content = document.getElementById('documentText').innerText;
-        const blob = new Blob([content], { type: 'text/plain' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = '{{ doc_type }}.txt';
-        a.click();
-        window.URL.revokeObjectURL(url);
+    // Document statistics calculation
+    function updateDocStatistics() {
+        const textElement = document.getElementById('documentText');
+        if (!textElement) return;
+        const text = textElement.innerText.trim();
+        const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+        const readingTime = Math.max(1, Math.ceil(words / 200));
+
+        const wordCountEl = document.getElementById('metaWordCount');
+        const readingTimeEl = document.getElementById('metaReadingTime');
+
+        if (wordCountEl) wordCountEl.innerText = `${words.toLocaleString()} words`;
+        if (readingTimeEl) readingTimeEl.innerText = `~${readingTime} min read`;
     }
 
+    // Workspace Alert Helper
+    function showWorkspaceAlert(message, type = 'success') {
+        const container = document.getElementById('workspaceAlertContainer');
+        if (!container) return;
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show shadow-sm mb-3`;
+        alert.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        container.innerHTML = '';
+        container.appendChild(alert);
+        alert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setTimeout(() => {
+            if (alert && alert.parentElement) {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 300);
+            }
+        }, 5000);
+    }
+
+    // 1. Download as TXT
+    function downloadAsText() {
+        const btn = document.getElementById('btnDownloadTxt');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Exporting...</span>';
+        btn.disabled = true;
+
+        try {
+            const content = document.getElementById('documentText').innerText;
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '{{ doc_type }}_' + new Date().toISOString().slice(0, 10) + '.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            showWorkspaceAlert('TXT file downloaded successfully!', 'success');
+        } catch (err) {
+            console.error('TXT download error:', err);
+            showWorkspaceAlert('Failed to download TXT file.', 'danger');
+        } finally {
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+        }
+    }
+
+    // 2. Download as DOCX
     function downloadAsDocx() {
+        const btn = document.getElementById('btnDownloadDocx');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Exporting...</span>';
+        btn.disabled = true;
+
         const content = document.getElementById('documentText').innerText;
         const docType = '{{ doc_type }}';
-        
-        // Create form data for API call
-        const formData = {
-            document_type: docType,
-            filled_data: { content: content },
-            format: 'docx'
-        };
-        
-        // Call backend API to generate DOCX
+
         fetch('/api/generate-document', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                document_type: docType,
+                filled_data: { content: content },
+                format: 'docx'
+            })
         })
         .then(response => {
-            if (response.ok) {
-                return response.blob();
-            }
+            if (response.ok) return response.blob();
             throw new Error('Failed to generate DOCX');
         })
         .then(blob => {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = docType + '_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.docx';
+            a.download = docType + '_' + new Date().toISOString().slice(0, 19).replace(/:/g, '-') + '.docx';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
+            showWorkspaceAlert('DOCX file generated and downloaded successfully!', 'success');
         })
         .catch(error => {
-            console.error('Error downloading DOCX:', error);
-            alert('Failed to download DOCX. Please try again.');
+            console.error('DOCX download error:', error);
+            showWorkspaceAlert('Failed to generate DOCX. Please try again.', 'danger');
+        })
+        .finally(() => {
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
         });
     }
 
+    // 3. Download as PDF
     function downloadAsPdf() {
+        const btn = document.getElementById('btnDownloadPdf');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Exporting...</span>';
+        btn.disabled = true;
+
         const content = document.getElementById('documentText').innerText;
         const docType = '{{ doc_type }}';
-        
-        // Create form data for API call
-        const formData = {
-            document_type: docType,
-            filled_data: { content: content },
-            format: 'pdf'
-        };
-        
-        // Call backend API to generate PDF
+
         fetch('/api/generate-document', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                document_type: docType,
+                filled_data: { content: content },
+                format: 'pdf'
+            })
         })
         .then(response => {
-            if (response.ok) {
-                return response.blob();
-            }
+            if (response.ok) return response.blob();
             throw new Error('Failed to generate PDF');
         })
         .then(blob => {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = docType + '_' + new Date().toISOString().slice(0,19).replace(/:/g, '-') + '.pdf';
+            a.download = docType + '_' + new Date().toISOString().slice(0, 19).replace(/:/g, '-') + '.pdf';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
+            showWorkspaceAlert('PDF document generated and downloaded successfully!', 'success');
         })
         .catch(error => {
-            console.error('Error downloading PDF:', error);
-            alert('Failed to download PDF. Please try again.');
+            console.error('PDF download error:', error);
+            showWorkspaceAlert('Failed to generate PDF. Please try again.', 'danger');
+        })
+        .finally(() => {
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
         });
     }
 
-    // Inline Editing Logic
+    // Copy document to clipboard
+    const copyDocBtn = document.getElementById('copyDocBtn');
+    if (copyDocBtn) {
+        copyDocBtn.addEventListener('click', () => {
+            const content = document.getElementById('documentText').innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                const orig = copyDocBtn.innerHTML;
+                copyDocBtn.innerHTML = '<i class="fas fa-check text-success"></i> <span>Copied!</span>';
+                setTimeout(() => { copyDocBtn.innerHTML = orig; }, 2000);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+            });
+        });
+    }
+
+    // In-Place Document Editing Logic
     const editDocumentBtn = document.getElementById('editDocumentBtn');
     const saveChangesBtn = document.getElementById('saveChangesBtn');
-    const documentContent = document.getElementById('document-content');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
     const documentText = document.getElementById('documentText');
+    const rawOriginalContent = document.getElementById('rawOriginalContent');
+    const docPaperWrapper = document.getElementById('docPaperWrapper');
+    const editAlertBanner = document.getElementById('editAlertBanner');
 
-    editDocumentBtn.addEventListener('click', () => {
-        const isEditable = documentContent.getAttribute('contenteditable') === 'true';
-        documentContent.setAttribute('contenteditable', !isEditable);
-        editDocumentBtn.style.display = isEditable ? 'inline-block' : 'none';
-        saveChangesBtn.style.display = isEditable ? 'none' : 'inline-block';
-        documentContent.focus(); // Focus on the content to make it clear it's editable
-    });
+    function enterEditMode() {
+        documentText.setAttribute('contenteditable', 'true');
+        docPaperWrapper.classList.add('is-editing');
+        editAlertBanner.style.display = 'block';
 
-    saveChangesBtn.addEventListener('click', () => {
-        const editedContent = documentText.innerText;
-        const docType = '{{ doc_type }}'; // Get doc_type from Jinja context
+        editDocumentBtn.style.display = 'none';
+        saveChangesBtn.style.display = 'inline-flex';
+        cancelEditBtn.style.display = 'inline-flex';
 
-        fetch('/edit_document', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                doc_type: docType,
-                edited_content: editedContent
-            })
-        })
-        .then(response => response.text()) // Assuming the response is a rendered HTML
-        .then(html => {
-            // Replace the current document with the updated HTML
-            document.open();
-            document.write(html);
-            document.close();
-            // Optional: Show a success message
-            // alert('Changes saved successfully!');
-            // documentContent.setAttribute('contenteditable', 'false');
-            // editDocumentBtn.style.display = 'inline-block';
-            // saveChangesBtn.style.display = 'none';
-        })
-        .catch(error => {
-            console.error('Error saving document:', error);
-            alert('Failed to save changes. Please try again.');
+        documentText.focus();
+    }
+
+    function exitEditMode() {
+        documentText.setAttribute('contenteditable', 'false');
+        docPaperWrapper.classList.remove('is-editing');
+        editAlertBanner.style.display = 'none';
+
+        editDocumentBtn.style.display = 'inline-flex';
+        saveChangesBtn.style.display = 'none';
+        cancelEditBtn.style.display = 'none';
+
+        updateDocStatistics();
+    }
+
+    if (editDocumentBtn) {
+        editDocumentBtn.addEventListener('click', enterEditMode);
+    }
+
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', () => {
+            // Revert changes back to ground-truth content
+            documentText.innerText = rawOriginalContent.value;
+            exitEditMode();
+            showWorkspaceAlert('Editing cancelled. Original document restored.', 'info');
         });
-    });
+    }
+
+    if (saveChangesBtn) {
+        saveChangesBtn.addEventListener('click', () => {
+            const editedContent = documentText.innerText;
+            const docType = '{{ doc_type }}';
+
+            saveChangesBtn.disabled = true;
+            saveChangesBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Saving...</span>';
+
+            fetch('/edit_document', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    doc_type: docType,
+                    edited_content: editedContent
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Update our backup ground-truth content
+                    rawOriginalContent.value = editedContent;
+                    exitEditMode();
+                    showWorkspaceAlert('Changes saved successfully! Your document is up to date.', 'success');
+                } else {
+                    throw new Error('Server returned error while saving');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving document:', error);
+                showWorkspaceAlert('Failed to save changes to server. Please try again.', 'danger');
+            })
+            .finally(() => {
+                saveChangesBtn.disabled = false;
+                saveChangesBtn.innerHTML = '<i class="fas fa-check"></i> <span>Save Changes</span>';
+            });
+        });
+    }
+
+    // Initialize statistics on load
+    document.addEventListener('DOMContentLoaded', updateDocStatistics);
     </script>
 </body>
 </html>

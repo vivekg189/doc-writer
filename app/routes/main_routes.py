@@ -1,5 +1,5 @@
 """Main application routes."""
-from flask import render_template, session, flash
+from flask import render_template, session, flash, redirect, url_for
 from . import main_bp
 from app.models.users import get_user_from_session
 from app.models.history import get_user_history, get_user_documents
@@ -8,6 +8,14 @@ from app.models.history import get_user_history, get_user_documents
 def index():
     user = get_user_from_session(session)
     return render_template('index.html', user=user)
+
+@main_bp.route('/login')
+def redirect_login():
+    return redirect(url_for('auth.login'))
+
+@main_bp.route('/signup')
+def redirect_signup():
+    return redirect(url_for('auth.signup'))
 
 @main_bp.route('/history')
 def user_history():

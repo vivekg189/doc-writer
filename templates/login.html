@@ -3,455 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Legal Document Generator</title>
+    <title>Sign In - Legal Document Generator</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Supabase JS & Auth -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="{{ url_for('static', filename='js/auth.js') }}" defer></script>
+    <!-- Custom Style System -->
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        }
-        .login-container {
-            min-height: 100vh;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .scroll-section {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        .tv-ad-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        .tv-screen {
-            width: 80%;
-            max-width: 800px;
-            aspect-ratio: 16/9;
-            background: #222;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        .tv-content {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-            position: relative;
-        }
-        .tv-logo {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            animation: logoFloat 3s ease-in-out infinite;
-        }
-        .tv-text {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            opacity: 0;
-        }
-        .tv-subtext {
-            font-size: 1.2rem;
-            opacity: 0;
-        }
-        @keyframes logoFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        .animated-text {
-            opacity: 0;
-            transform: translateY(50px);
-        }
-        .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2), 0 0 20px rgba(102, 126, 234, 0.3);
-            overflow: hidden;
-            position: relative;
-            opacity: 0;
-            transform: translateY(100px) scale(0.8);
-        }
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: shimmer 3s infinite;
-        }
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        .login-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            color: white;
-            padding: 2.5rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .login-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            animation: rotate 10s linear infinite;
-        }
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .login-header h4 {
-            margin: 0;
-            font-weight: 700;
-            font-size: 2rem;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            animation: textGlow 2s ease-in-out infinite alternate;
-        }
-        @keyframes textGlow {
-            from { text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
-            to { text-shadow: 0 2px 20px rgba(255, 255, 255, 0.5); }
-        }
-        .login-header p {
-            margin: 0.5rem 0 0 0;
-            opacity: 0.95;
-            font-size: 1rem;
-            font-weight: 300;
-        }
-        .form-control {
-            border: 2px solid #e5e7eb;
-            border-radius: 15px;
-            padding: 1rem 1.25rem;
-            font-size: 1rem;
-            background: white;
-            color: #333;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2), 0 0 20px rgba(102, 126, 234, 0.3);
-            background: white;
-            transform: translateY(-2px);
-        }
-        .form-control::placeholder {
-            color: rgba(0, 0, 0, 0.5);
-        }
-        .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            border: none;
-            border-radius: 15px;
-            padding: 1rem 2.5rem;
-            font-weight: 700;
-            font-size: 1.1rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .btn-login::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-        .btn-login:hover::before {
-            left: 100%;
-        }
-        .btn-login:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4), 0 0 30px rgba(240, 147, 251, 0.3);
-        }
-        .btn-login:active {
-            transform: translateY(-1px) scale(1.02);
-        }
-        .login-footer {
-            background: #f8fafc;
-            padding: 2rem;
-            text-align: center;
-            border-top: 1px solid #e5e7eb;
-        }
-        .login-footer a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .login-footer a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #667eea, #f093fb);
-            transition: width 0.3s ease;
-        }
-        .login-footer a:hover::after {
-            width: 100%;
-        }
-        .login-footer a:hover {
-            color: #f093fb;
-            transform: translateY(-1px);
-        }
-        .input-group-text {
-            background: #f8fafc;
-            border: 2px solid #e5e7eb;
-            border-right: none;
-            color: #6b7280;
-            border-radius: 15px 0 0 15px;
-        }
-        .alert {
-            border-radius: 15px;
-            border: none;
-            backdrop-filter: blur(10px);
-            animation: alertSlide 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes alertSlide {
-            from {
-                opacity: 0;
-                transform: translateX(-30px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-        }
-        .loading {
-            display: none;
-        }
-        .spinner-border-sm {
-            width: 1rem;
-            height: 1rem;
-        }
-        .btn-outline-danger {
-            border: 2px solid #ff6b6b;
-            border-radius: 15px;
-            padding: 1rem 2.5rem;
-            font-weight: 600;
-            background: rgba(255, 107, 107, 0.1);
-            backdrop-filter: blur(10px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-outline-danger:hover {
-            background: #ff6b6b;
-            border-color: #ff6b6b;
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
-        }
-        .card-body {
-            padding: 3rem;
-            background: white;
-        }
-        .fas {
-            animation: iconPulse 2s ease-in-out infinite;
-        }
-        @keyframes iconPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-    </style>
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-<body>
-    
-    <!-- TV Ad Container -->
-    <div class="tv-ad-container" id="tvAd">
-        <div class="tv-screen">
-            <div class="tv-content">
-                <div class="tv-logo">
-                    <i class="fas fa-gavel"></i>
-                </div>
-                <div class="tv-text" id="tvText1">Legal Document Generator</div>
-                <div class="tv-subtext" id="tvText2">Professional. Secure. Efficient.</div>
-                <div class="tv-subtext" id="tvText3">Generate legal documents with AI precision</div>
-            </div>
-        </div>
-    </div>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary" style="background: rgba(74, 85, 104, 0.9) !important; backdrop-filter: blur(20px);">
+<body class="bg-light">
+
+    <!-- Minimal Modern Navbar -->
+    <nav class="navbar navbar-expand-lg custom-navbar">
         <div class="container">
-            <a class="navbar-brand animated-text" href="{{ url_for('main.index') }}">
-                <i class="fas fa-gavel me-2"></i>Legal Document Generator
+            <a class="navbar-brand navbar-brand-custom" href="{{ url_for('main.index') }}">
+                <span class="brand-icon-wrapper">
+                    <i class="fas fa-gavel"></i>
+                </span>
+                <span>Legal Document Generator</span>
             </a>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <a href="{{ url_for('main.index') }}" class="btn-premium btn-premium-secondary small">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Home</span>
+                </a>
+            </div>
         </div>
     </nav>
 
-    <div class="login-container">
+    <!-- Centered Auth Card Container -->
+    <div class="auth-page-wrapper">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-5">
-                    {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>{{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
+                <div class="col-md-8 col-lg-6 col-xl-5">
+                    
+                    <!-- Alert Message Container -->
+                    <div id="alertContainer">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category in ['error', 'danger'] else 'success' }} alert-dismissible fade show custom-alert shadow-sm" role="alert">
+                                        <i class="fas fa-{{ 'circle-exclamation' if category in ['error', 'danger'] else 'circle-check' }} fs-5"></i>
+                                        <div>{{ message }}</div>
+                                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                    </div>
 
-                    <div class="card login-card">
-                        <div class="login-header">
-                            <i class="fas fa-sign-in-alt fa-2x mb-3 animated-text"></i>
-                            <h4 class="animated-text">Welcome Back</h4>
-                            <p class="animated-text">Sign in to your account</p>
+                    <!-- Auth Card -->
+                    <div class="auth-card">
+                        <div class="auth-brand-header">
+                            <div class="auth-brand-logo">
+                                <i class="fas fa-gavel"></i>
+                            </div>
+                            <h2 class="auth-title">Welcome Back</h2>
+                            <p class="auth-subtitle">Sign in to continue creating legal documents.</p>
                         </div>
-                        <div class="card-body p-4">
-                            <form id="loginForm">
-                                <div class="mb-4 animated-text">
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
-                                    </div>
+
+                        <!-- Login Form -->
+                        <form id="loginForm" novalidate>
+                            <!-- Email -->
+                            <div class="auth-form-group">
+                                <label for="email" class="auth-label">Email Address</label>
+                                <div class="auth-input-group">
+                                    <i class="fas fa-envelope auth-input-icon"></i>
+                                    <input 
+                                        type="email" 
+                                        class="auth-input" 
+                                        id="email" 
+                                        name="email" 
+                                        placeholder="name@example.com" 
+                                        required 
+                                        autocomplete="email">
                                 </div>
-                                <div class="mb-4 animated-text">
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-                                    </div>
-                                </div>
-                                <div class="mb-4 d-flex justify-content-between align-items-center animated-text">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="remember">
-                                        <label class="form-check-label" for="remember">
-                                            Remember me
-                                        </label>
-                                    </div>
-                                    <a href="#" class="text-decoration-none">Forgot password?</a>
-                                </div>
-                                <div class="d-grid animated-text">
-                                    <button type="submit" class="btn btn-primary btn-login" id="loginBtn">
-                                        <span class="btn-text"><i class="fas fa-sign-in-alt me-2"></i>Sign In</span>
-                                        <span class="loading"><i class="fas fa-spinner fa-spin me-2"></i>Signing In...</span>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="auth-form-group">
+                                <label for="password" class="auth-label">Password</label>
+                                <div class="auth-input-group">
+                                    <i class="fas fa-lock auth-input-icon"></i>
+                                    <input 
+                                        type="password" 
+                                        class="auth-input" 
+                                        id="password" 
+                                        name="password" 
+                                        placeholder="Enter your password" 
+                                        required 
+                                        autocomplete="current-password"
+                                        style="padding-right: 2.85rem;">
+                                    <button type="button" class="password-toggle-btn" id="togglePasswordBtn" title="Show or hide password">
+                                        <i class="fas fa-eye" id="togglePasswordIcon"></i>
                                     </button>
                                 </div>
-                                <div class="text-center my-3 animated-text">
-                                    <span class="text-muted">or</span>
+                            </div>
+
+                            <!-- Options: Remember Me & Forgot Password -->
+                            <div class="auth-actions-group">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" id="remember">
+                                    <label class="form-check-label text-secondary small" for="remember">
+                                        Remember me
+                                    </label>
                                 </div>
-                                <div class="d-grid animated-text">
-                                    <div id="googleLoginBtn"></div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="login-footer">
-                            <p class="mb-0 animated-text">Don't have an account?
-                                <a href="{{ url_for('auth.signup') }}">Create one here</a>
+                                <a href="#" class="auth-link small" onclick="handleForgotPassword(event)">Forgot password?</a>
+                            </div>
+
+                            <!-- Sign In Button -->
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn-premium btn-premium-primary btn-premium-lg w-100" id="loginBtn">
+                                    <span class="btn-text">
+                                        <i class="fas fa-arrow-right-to-bracket me-2"></i>Sign In
+                                    </span>
+                                    <span class="loading d-none">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>Signing In...
+                                    </span>
+                                </button>
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="divider-with-text">or continue with</div>
+
+                            <!-- Google OAuth Button -->
+                            <div class="google-btn-wrapper">
+                                <div id="googleLoginBtn"></div>
+                            </div>
+                        </form>
+
+                        <!-- Footer -->
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <p class="text-secondary small mb-0">
+                                Don't have an account? 
+                                <a href="{{ url_for('auth.signup') }}" class="auth-link fw-semibold">Create one here</a>
                             </p>
                         </div>
                     </div>
+
+                    <!-- Security Badge -->
+                    <div class="text-center mt-3 text-muted small">
+                        <i class="fas fa-shield-halved text-primary me-1"></i>
+                        <span>Protected by Supabase Authentication & 256-bit SSL</span>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
-        // TV Ad and Animations
-        window.addEventListener('load', () => {
-            gsap.registerPlugin(ScrollTrigger);
-            
-            const tvAd = document.getElementById('tvAd');
-            tvAd.style.display = 'flex';
-            
-            gsap.timeline()
-                .fromTo('.tv-screen', { scale: 0, rotation: 180 }, { scale: 1, rotation: 0, duration: 1.2, ease: 'back.out(1.7)' })
-                .to('#tvText1', { opacity: 1, y: 0, duration: 0.8 }, '+=0.3')
-                .to('#tvText2', { opacity: 1, y: 0, duration: 0.8 }, '+=0.4')
-                .to('#tvText3', { opacity: 1, y: 0, duration: 0.8 }, '+=0.4')
-                .to(tvAd, { opacity: 0, duration: 0.8, delay: 1, onComplete: () => {
-                    tvAd.style.display = 'none';
-                    gsap.to('.login-card', { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'back.out(1.7)' });
-                    gsap.to('.animated-text', { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, delay: 0.3 });
-                }});
-        });
-        
-        // Interactive effects
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.btn').forEach(btn => {
-                btn.addEventListener('mouseenter', () => gsap.to(btn, { scale: 1.05, duration: 0.3 }));
-                btn.addEventListener('mouseleave', () => gsap.to(btn, { scale: 1, duration: 0.3 }));
-            });
-            
-            document.querySelectorAll('.form-control').forEach(input => {
-                input.addEventListener('focus', () => gsap.to(input.parentElement, { scale: 1.02, duration: 0.3 }));
-                input.addEventListener('blur', () => gsap.to(input.parentElement, { scale: 1, duration: 0.3 }));
-            });
-        });
-        
-        // Set Supabase credentials for JavaScript
+        // Supabase configuration
         window.SUPABASE_URL = "{{ supabase_url }}";
         window.SUPABASE_KEY = "{{ supabase_anon_key }}";
-        
-        // Google Sign-In
+
+        // Password visibility toggle
+        const toggleBtn = document.getElementById('togglePasswordBtn');
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('togglePasswordIcon');
+
+        toggleBtn.addEventListener('click', function() {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        });
+
+        // Forgot password notice
+        function handleForgotPassword(e) {
+            e.preventDefault();
+            showAlert('Password reset link can be requested via your Supabase account administrator or email verification.', 'info');
+        }
+
+        // Helper to display alert
+        function showAlert(message, type = 'danger') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type === 'danger' ? 'danger' : 'info'} alert-dismissible fade show custom-alert shadow-sm`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'danger' ? 'circle-exclamation' : 'circle-info'} fs-5"></i>
+                <div>${message}</div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            container.innerHTML = '';
+            container.appendChild(alert);
+            alert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Google Sign-In Callback
         function handleGoogleLogin(response) {
             fetch('/auth/api/google-login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ credential: response.credential })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = '/';
+                    window.location.href = '{{ url_for("main.index") }}';
                 } else {
-                    alert('Google login failed: ' + data.error);
+                    showAlert('Google login failed: ' + (data.error || 'Unknown error'), 'danger');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('Google login failed');
+                console.error('Google Auth Error:', error);
+                showAlert('Google login failed. Please try again.', 'danger');
             });
         }
-        
+
+        // Initialize Google Sign-In
         window.onload = function() {
-            if ("{{ google_client_id }}" && "{{ google_client_id }}" !== "None" && "{{ google_client_id }}" !== "") {
+            const googleClientId = "{{ google_client_id }}";
+            if (googleClientId && googleClientId !== "None" && googleClientId !== "") {
                 try {
                     google.accounts.id.initialize({
-                        client_id: "{{ google_client_id }}",
+                        client_id: googleClientId,
                         callback: handleGoogleLogin,
                         auto_select: false,
                         cancel_on_tap_outside: false,
@@ -459,92 +240,67 @@
                     });
                     google.accounts.id.renderButton(
                         document.getElementById('googleLoginBtn'),
-                        { theme: 'outline', size: 'large', width: '100%' }
+                        { theme: 'outline', size: 'large', width: 280, shape: 'rectangular' }
                     );
                 } catch (error) {
-                    console.log('Google Sign-In not available:', error);
+                    console.warn('Google Sign-In initialization error:', error);
                     document.getElementById('googleLoginBtn').style.display = 'none';
                 }
             } else {
-                document.getElementById('googleLoginBtn').style.display = 'none';
+                const btnContainer = document.getElementById('googleLoginBtn');
+                if (btnContainer) btnContainer.style.display = 'none';
             }
         };
+
+        // Form Submission
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
             const loginBtn = document.getElementById('loginBtn');
             const btnText = loginBtn.querySelector('.btn-text');
             const loading = loginBtn.querySelector('.loading');
-            const colMd5 = document.querySelector('.col-md-5');
-            const card = document.querySelector('.card');
-
-            // Clear previous alerts
-            const existingAlerts = colMd5.querySelectorAll('.alert');
-            existingAlerts.forEach(alert => alert.remove());
 
             // Client-side validation
             const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
             if (!emailPattern.test(email)) {
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
-                errorAlert.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>Please enter a valid email address
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-                colMd5.insertBefore(errorAlert, card);
+                showAlert('Please enter a valid email address.');
+                document.getElementById('email').focus();
                 return;
             }
 
             if (!password) {
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
-                errorAlert.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>Please enter your password
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-                colMd5.insertBefore(errorAlert, card);
+                showAlert('Please enter your password.');
+                document.getElementById('password').focus();
                 return;
             }
 
             // Show loading state
-            btnText.style.display = 'none';
-            loading.style.display = 'inline';
+            btnText.classList.add('d-none');
+            loading.classList.remove('d-none');
             loginBtn.disabled = true;
 
             try {
                 const response = await fetch('/auth/api/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Login successful, redirect
-                    window.location.href = '/';
+                    window.location.href = '{{ url_for("main.index") }}';
                 } else {
-                    throw new Error(data.error || 'An unexpected error occurred during login.');
+                    showAlert(data.error || 'Invalid email or password.');
                 }
-
             } catch (error) {
                 console.error('Login error:', error);
-                // Show error message
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
-                errorAlert.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>${error.message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-                colMd5.insertBefore(errorAlert, card);
+                showAlert('A network error occurred during login. Please try again.');
             } finally {
-                // Hide loading state
-                btnText.style.display = 'inline';
-                loading.style.display = 'none';
+                btnText.classList.remove('d-none');
+                loading.classList.add('d-none');
                 loginBtn.disabled = false;
             }
         });

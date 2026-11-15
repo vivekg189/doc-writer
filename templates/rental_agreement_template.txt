@@ -36,7 +36,7 @@ Now this deed of rental agreement witness:
 
 9. The Landlord shall be responsible for major repairs and maintenance of the building structure.
 
-10. Either party can terminate this agreement by giving {{notice_period}} months' written notice to the other party.
+10. Either party can terminate this agreement by giving {{notice_period}} written notice to the other party.
 
 11. In case of any dispute arising out of this agreement, the same shall be subject to the jurisdiction of the courts in {{jurisdiction}}.
 

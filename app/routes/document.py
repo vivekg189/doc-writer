@@ -359,8 +359,10 @@ def document_form(doc_type):
     languages = [{'code': lang, 'name': language_mapping.get(lang, lang.upper())} for lang in documents[doc_type]['templates'].keys()]
     return render_template('document_form.html', doc_type=doc_type, fields=documents[doc_type]['fields'], languages=languages)
 
-@document_bp.route('/generate', methods=['POST'])
+@document_bp.route('/generate', methods=['GET', 'POST'])
 def generate_document():
+    if request.method == 'GET':
+        return render_template('generate.html')
     print("DEBUG: generate_document route called")
     doc_type = request.form.get('doc_type')
     language = request.form.get('language', 'en')
@@ -580,17 +582,18 @@ def generate_document():
         languages = list(documents[doc_type]['templates'].keys())
         return render_template('document_form.html', doc_type=doc_type, fields=fields, error=error_message, values=data, languages=languages, selected_language=language)
 
-@document_bp.route('/generate_from_prompt', methods=['POST'])
+@document_bp.route('/generate_from_prompt', methods=['GET', 'POST'])
 def generate_from_prompt():
+    if request.method == 'GET':
+        return render_template('generate.html')
     prompt = request.form.get('prompt', '').strip()
     if not prompt:
         flash('Please enter a prompt describing the document you want to generate.', 'error')
         return render_template('index.html')
 
     try:
-        # Extract language from prompt, default to 'en'
-        language_match = re.search(r'in\s+([a-zA-Z]+)', prompt)
-        language = language_match.group(1).lower() if language_match else 'en'
+        # Extract language safely using processor
+        language = processor.extract_language(prompt)
 
         # Classify document type
         doc_type = processor.classify_document_type(prompt)
@@ -598,8 +601,19 @@ def generate_from_prompt():
             flash('Could not determine document type from your prompt. Please try rephrasing.', 'error')
             return render_template('index.html')
 
-        # Extract entities
+        # Extract entities using advanced contextual legal extractor
         entities = processor.extract_entities(prompt)
+
+        # Validate extracted entities before generation
+        is_valid, validation_errors, validation_warnings = processor.validate_entities(doc_type, entities)
+        if not is_valid:
+            for err in validation_errors:
+                flash(err, 'danger')
+            return redirect(request.referrer or url_for('document.generate_from_prompt'))
+
+        if validation_warnings:
+            for warn in validation_warnings:
+                flash(f"Note: {warn} A standard legal placeholder was used.", 'info')
 
         # Generate document
         document = processor.generate_document(doc_type, entities, language=language)
@@ -624,8 +638,8 @@ def generate_from_prompt():
                 entities  # Save the extracted entities
             )
 
-        flash(f'Document type classified as: {doc_type.replace("_", " ").title()}', 'success')
-        return render_template('view_document.html', doc_type=doc_type, content=document, entities=extracted_entities, prompt=prompt)
+        flash(f'Document successfully drafted for: {doc_type.replace("_", " ").title()}', 'success')
+        return render_template('view_document.html', doc_type=doc_type, content=document, entities=extracted_entities, prompt=prompt, language=language)
 
     except Exception as e:
         flash(f'Error generating document: {str(e)}', 'error')

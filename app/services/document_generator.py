@@ -196,12 +196,38 @@ class DocumentGenerator:
     def generate_rental_agreement(self, data, language='en'):
         """Generate a rental agreement document."""
         template = self._load_template('rental_agreement', language)
-        current_date = datetime.now().strftime("%B %d, %Y")
+        now = datetime.now()
         data_with_date = data.copy()
-        data_with_date['date'] = current_date
-        
+
+        # Preserve specific day, month, year for template execution clause
+        if 'date' not in data_with_date or not data_with_date['date']:
+            data_with_date['date'] = str(now.day)
+        if 'month' not in data_with_date or not data_with_date['month']:
+            data_with_date['month'] = now.strftime("%B")
+        if 'year' not in data_with_date or not data_with_date['year']:
+            data_with_date['year'] = str(now.year)
+        if 'execution_date' not in data_with_date or not data_with_date['execution_date']:
+            data_with_date['execution_date'] = now.strftime("%d %B %Y")
+
+        # Validate template and fill missing variables
+        try:
+            template_file_name = 'rental_agreement_template.txt'
+            if language != 'en':
+                template_path = os.path.join(self.base_template_dir, language, template_file_name)
+            else:
+                template_path = os.path.join(self.base_template_dir, template_file_name)
+
+            if os.path.exists(template_path):
+                with open(template_path, 'r', encoding='utf-8') as f:
+                    template_content = f.read()
+
+                validation_result = validate_template_data(template_content, data_with_date)
+                if not validation_result['is_valid']:
+                    data_with_date = fill_missing_variables(data_with_date, validation_result['missing_variables'], 'rental_agreement')
+        except Exception as e:
+            print(f"Rental template validation notice: {e}")
+
         document = template.render(**data_with_date)
-        
         return document
 
     def generate_document(self, doc_type, data, language='en'):

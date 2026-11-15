@@ -3,390 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Legal Document Generator</title>
+    <title>Create Account - Legal Document Generator</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Supabase JS & Auth -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="{{ url_for('static', filename='js/auth.js') }}" defer></script>
+    <!-- Custom Style System -->
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        }
-        .signup-container {
-            min-height: 100vh;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .animated-text {
-            opacity: 0;
-            transform: translateY(50px);
-        }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
-        }
-        .signup-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2), 0 0 20px rgba(102, 126, 234, 0.3);
-            overflow: hidden;
-            position: relative;
-            opacity: 0;
-            transform: translateY(100px) scale(0.8);
-        }
-        .signup-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            animation: shimmer 2s infinite;
-        }
-        @keyframes cardFloat {
-            from {
-                opacity: 0;
-                transform: translateY(50px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-        @keyframes glow {
-            from { box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 255, 255, 0.1); }
-            to { box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2), 0 0 40px rgba(255, 255, 255, 0.3); }
-        }
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        .signup-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            color: white;
-            padding: 2.5rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .signup-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            animation: rotate 10s linear infinite;
-        }
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .signup-header h4 {
-            margin: 0;
-            font-weight: 700;
-            font-size: 2rem;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            animation: textGlow 2s ease-in-out infinite alternate;
-        }
-        @keyframes textGlow {
-            from { text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
-            to { text-shadow: 0 2px 20px rgba(255, 255, 255, 0.5); }
-        }
-        .signup-header p {
-            margin: 0.5rem 0 0 0;
-            opacity: 0.95;
-            font-size: 1rem;
-            font-weight: 300;
-        }
-        .form-control {
-            border: 2px solid #e5e7eb;
-            border-radius: 15px;
-            padding: 1rem 1.25rem;
-            font-size: 1rem;
-            background: white;
-            color: #333;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2), 0 0 20px rgba(102, 126, 234, 0.3);
-            background: white;
-            transform: translateY(-2px);
-        }
-        .form-control::placeholder {
-            color: rgba(0, 0, 0, 0.5);
-        }
-        .btn-signup {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            border: none;
-            border-radius: 15px;
-            padding: 1rem 2.5rem;
-            font-weight: 700;
-            font-size: 1.1rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .btn-signup::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-        .btn-signup:hover::before {
-            left: 100%;
-        }
-        .btn-signup:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4), 0 0 30px rgba(240, 147, 251, 0.3);
-        }
-        .btn-signup:active {
-            transform: translateY(-1px) scale(1.02);
-        }
-        .signup-footer {
-            background: #f8fafc;
-            padding: 2rem;
-            text-align: center;
-            border-top: 1px solid #e5e7eb;
-        }
-        .signup-footer a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .signup-footer a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #667eea, #f093fb);
-            transition: width 0.3s ease;
-        }
-        .signup-footer a:hover::after {
-            width: 100%;
-        }
-        .signup-footer a:hover {
-            color: #f093fb;
-            transform: translateY(-1px);
-        }
-        .input-group-text {
-            background: #f8fafc;
-            border: 2px solid #e5e7eb;
-            border-right: none;
-            color: #6b7280;
-            border-radius: 15px 0 0 15px;
-        }
-        .alert {
-            border-radius: 15px;
-            border: none;
-            backdrop-filter: blur(10px);
-            animation: alertSlide 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes alertSlide {
-            from {
-                opacity: 0;
-                transform: translateX(-30px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-        }
-        .password-strength {
-            display: none;
-            margin-top: 0.75rem;
-        }
-        .strength-weak { color: #ff6b6b; font-weight: 600; }
-        .strength-medium { color: #feca57; font-weight: 600; }
-        .strength-strong { color: #48dbfb; font-weight: 600; }
-        .loading {
-            display: none;
-        }
-        .spinner-border-sm {
-            width: 1rem;
-            height: 1rem;
-        }
-        .btn-outline-danger {
-            border: 2px solid #ff6b6b;
-            border-radius: 15px;
-            padding: 1rem 2.5rem;
-            font-weight: 600;
-            background: rgba(255, 107, 107, 0.1);
-            backdrop-filter: blur(10px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-outline-danger:hover {
-            background: #ff6b6b;
-            border-color: #ff6b6b;
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
-        }
-        .card-body {
-            padding: 3rem;
-            background: white;
-        }
-        .fas {
-            animation: iconPulse 2s ease-in-out infinite;
-        }
-        @keyframes iconPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-    </style>
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary" style="background: rgba(74, 85, 104, 0.9) !important; backdrop-filter: blur(20px);">
+<body class="bg-light">
+
+    <!-- Minimal Modern Navbar -->
+    <nav class="navbar navbar-expand-lg custom-navbar">
         <div class="container">
-            <a class="navbar-brand animated-text" href="{{ url_for('main.index') }}">
-                <i class="fas fa-gavel me-2"></i>Legal Document Generator
+            <a class="navbar-brand navbar-brand-custom" href="{{ url_for('main.index') }}">
+                <span class="brand-icon-wrapper">
+                    <i class="fas fa-gavel"></i>
+                </span>
+                <span>Legal Document Generator</span>
             </a>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <a href="{{ url_for('main.index') }}" class="btn-premium btn-premium-secondary small">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Home</span>
+                </a>
+            </div>
         </div>
     </nav>
 
-    <div class="signup-container">
+    <!-- Centered Auth Card Container -->
+    <div class="auth-page-wrapper">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-5">
-                    {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>{{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
+                <div class="col-md-9 col-lg-7 col-xl-5">
+                    
+                    <!-- Alert Message Container -->
+                    <div id="alertContainer">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category in ['error', 'danger'] else 'success' }} alert-dismissible fade show custom-alert shadow-sm" role="alert">
+                                        <i class="fas fa-{{ 'circle-exclamation' if category in ['error', 'danger'] else 'circle-check' }} fs-5"></i>
+                                        <div>{{ message }}</div>
+                                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                    </div>
 
-                    <div class="card signup-card">
-                        <div class="signup-header">
-                            <i class="fas fa-user-plus fa-2x mb-3 animated-text"></i>
-                            <h4 class="animated-text">Join Us Today</h4>
-                            <p class="animated-text">Create your account to get started</p>
+                    <!-- Auth Card -->
+                    <div class="auth-card">
+                        <div class="auth-brand-header">
+                            <div class="auth-brand-logo">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <h2 class="auth-title">Create Account</h2>
+                            <p class="auth-subtitle">Sign up to draft, store, and export legal documents.</p>
                         </div>
-                        <div class="card-body p-4">
-                            <form id="signupForm">
-                                <div class="mb-4 animated-text">
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
-                                    </div>
+
+                        <!-- Signup Form -->
+                        <form id="signupForm" novalidate>
+                            <!-- Full Name -->
+                            <div class="auth-form-group">
+                                <label for="fullName" class="auth-label">Full Name</label>
+                                <div class="auth-input-group">
+                                    <i class="fas fa-user auth-input-icon"></i>
+                                    <input 
+                                        type="text" 
+                                        class="auth-input" 
+                                        id="fullName" 
+                                        name="full_name" 
+                                        placeholder="e.g. Rahul Sharma" 
+                                        autocomplete="name">
                                 </div>
-                                <div class="mb-4 animated-text">
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" required>
-                                    </div>
-                                    <div class="password-strength" id="passwordStrength">
-                                        <small class="strength-weak"><i class="fas fa-exclamation-triangle me-1"></i>Password is too weak</small>
-                                        <small class="strength-medium"><i class="fas fa-exclamation-circle me-1"></i>Password is medium strength</small>
-                                        <small class="strength-strong"><i class="fas fa-check-circle me-1"></i>Password is strong</small>
-                                    </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="auth-form-group">
+                                <label for="email" class="auth-label">Email Address <span class="text-danger">*</span></label>
+                                <div class="auth-input-group">
+                                    <i class="fas fa-envelope auth-input-icon"></i>
+                                    <input 
+                                        type="email" 
+                                        class="auth-input" 
+                                        id="email" 
+                                        name="email" 
+                                        placeholder="name@example.com" 
+                                        required 
+                                        autocomplete="email">
                                 </div>
-                                <div class="mb-4 animated-text">
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                        <input type="password" class="form-control" id="confirmPassword" name="confirm_password" placeholder="Confirm your password" required>
-                                    </div>
-                                    <div class="invalid-feedback" id="confirmPasswordFeedback">
-                                        Passwords do not match.
-                                    </div>
-                                </div>
-                                <div class="mb-4 animated-text">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="terms" required>
-                                        <label class="form-check-label" for="terms">
-                                            I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="d-grid animated-text">
-                                    <button type="submit" class="btn btn-primary btn-signup" id="signupBtn">
-                                        <span class="btn-text"><i class="fas fa-user-plus me-2"></i>Create Account</span>
-                                        <span class="loading"><i class="fas fa-spinner fa-spin me-2"></i>Creating Account...</span>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="auth-form-group">
+                                <label for="password" class="auth-label">Password <span class="text-danger">*</span></label>
+                                <div class="auth-input-group">
+                                    <i class="fas fa-lock auth-input-icon"></i>
+                                    <input 
+                                        type="password" 
+                                        class="auth-input" 
+                                        id="password" 
+                                        name="password" 
+                                        placeholder="At least 6 characters" 
+                                        required 
+                                        autocomplete="new-password"
+                                        style="padding-right: 2.85rem;">
+                                    <button type="button" class="password-toggle-btn" id="togglePasswordBtn" title="Show or hide password">
+                                        <i class="fas fa-eye" id="togglePasswordIcon"></i>
                                     </button>
                                 </div>
-                                <div class="text-center my-3 animated-text">
-                                    <span class="text-muted">or</span>
+                                <!-- Password Strength Indicator -->
+                                <div class="strength-meter-wrapper">
+                                    <div class="strength-meter-bar" id="strengthBar"></div>
                                 </div>
-                                <div class="d-grid animated-text">
-                                    <div id="googleSignupBtn"></div>
+                                <div class="password-strength-label text-muted" id="strengthLabel">
+                                    <span>Password strength:</span>
+                                    <span id="strengthText" class="fw-semibold">None</span>
                                 </div>
-                            </form>
-                        </div>
-                        <div class="signup-footer">
-                            <p class="mb-0 animated-text">Already have an account?
-                                <a href="{{ url_for('auth.login') }}">Sign in here</a>
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="auth-form-group">
+                                <label for="confirmPassword" class="auth-label">Confirm Password <span class="text-danger">*</span></label>
+                                <div class="auth-input-group">
+                                    <i class="fas fa-shield-alt auth-input-icon"></i>
+                                    <input 
+                                        type="password" 
+                                        class="auth-input" 
+                                        id="confirmPassword" 
+                                        name="confirm_password" 
+                                        placeholder="Re-enter password" 
+                                        required 
+                                        autocomplete="new-password"
+                                        style="padding-right: 2.85rem;">
+                                    <button type="button" class="password-toggle-btn" id="toggleConfirmBtn" title="Show or hide password">
+                                        <i class="fas fa-eye" id="toggleConfirmIcon"></i>
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback d-none" id="confirmPasswordFeedback">
+                                    Passwords do not match.
+                                </div>
+                            </div>
+
+                            <!-- Terms and Conditions -->
+                            <div class="auth-form-group mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terms" required checked>
+                                    <label class="form-check-label text-secondary small" for="terms">
+                                        I agree to the <a href="#" class="auth-link">Terms of Service</a> & <a href="#" class="auth-link">Privacy Policy</a>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Create Account Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn-premium btn-premium-primary btn-premium-lg w-100" id="signupBtn">
+                                    <span class="btn-text">
+                                        <i class="fas fa-user-plus me-2"></i>Create Account
+                                    </span>
+                                    <span class="loading d-none">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>Creating Account...
+                                    </span>
+                                </button>
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="divider-with-text">or sign up with</div>
+
+                            <!-- Google OAuth Button -->
+                            <div class="google-btn-wrapper">
+                                <div id="googleSignupBtn"></div>
+                            </div>
+                        </form>
+
+                        <!-- Footer -->
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <p class="text-secondary small mb-0">
+                                Already have an account? 
+                                <a href="{{ url_for('auth.login') }}" class="auth-link fw-semibold">Sign in here</a>
                             </p>
                         </div>
                     </div>
+
+                    <!-- Security Badge -->
+                    <div class="text-center mt-3 text-muted small">
+                        <i class="fas fa-shield-halved text-primary me-1"></i>
+                        <span>Protected by Supabase Authentication & 256-bit SSL</span>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
-        // Set Supabase credentials for JavaScript
+        // Supabase configuration
         window.SUPABASE_URL = "{{ supabase_url }}";
         window.SUPABASE_KEY = "{{ supabase_anon_key }}";
-        
-        // Google Sign-Up
+
+        // Password visibility toggles
+        function setupPasswordToggle(btnId, inputId, iconId) {
+            const btn = document.getElementById(btnId);
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+
+            btn.addEventListener('click', function() {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
+
+        setupPasswordToggle('togglePasswordBtn', 'password', 'togglePasswordIcon');
+        setupPasswordToggle('toggleConfirmBtn', 'confirmPassword', 'toggleConfirmIcon');
+
+        // Live Password Strength Indicator
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.getElementById('strengthBar');
+        const strengthText = document.getElementById('strengthText');
+
+        passwordInput.addEventListener('input', function() {
+            const val = this.value;
+            strengthBar.className = 'strength-meter-bar';
+
+            if (val.length === 0) {
+                strengthText.textContent = 'None';
+                strengthText.className = 'fw-semibold text-muted';
+                return;
+            }
+
+            let score = 0;
+            if (val.length >= 6) score++;
+            if (val.length >= 8) score++;
+            if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+            if (/\d/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+
+            if (score <= 2) {
+                strengthBar.classList.add('weak');
+                strengthText.textContent = 'Weak';
+                strengthText.className = 'fw-semibold text-danger';
+            } else if (score <= 4) {
+                strengthBar.classList.add('medium');
+                strengthText.textContent = 'Medium';
+                strengthText.className = 'fw-semibold text-warning';
+            } else {
+                strengthBar.classList.add('strong');
+                strengthText.textContent = 'Strong';
+                strengthText.className = 'fw-semibold text-success';
+            }
+        });
+
+        // Live Password Match Check
+        const confirmInput = document.getElementById('confirmPassword');
+        const confirmFeedback = document.getElementById('confirmPasswordFeedback');
+
+        confirmInput.addEventListener('input', function() {
+            if (this.value.length > 0 && this.value !== passwordInput.value) {
+                this.classList.add('is-invalid');
+                confirmFeedback.classList.remove('d-none');
+                confirmFeedback.style.display = 'block';
+            } else {
+                this.classList.remove('is-invalid');
+                confirmFeedback.classList.add('d-none');
+                confirmFeedback.style.display = 'none';
+            }
+        });
+
+        // Helper to display alert
+        function showAlert(message, type = 'danger') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type === 'danger' ? 'danger' : 'success'} alert-dismissible fade show custom-alert shadow-sm`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'danger' ? 'circle-exclamation' : 'circle-check'} fs-5"></i>
+                <div>${message}</div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            container.innerHTML = '';
+            container.appendChild(alert);
+            alert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Google Sign-Up Callback
         function handleGoogleSignup(response) {
             fetch('/auth/api/google-signup', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ credential: response.credential })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = '/';
+                    window.location.href = '{{ url_for("main.index") }}';
                 } else {
-                    alert('Google signup failed: ' + data.error);
+                    showAlert('Google signup failed: ' + (data.error || 'Unknown error'), 'danger');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('Google signup failed');
+                console.error('Google Auth Error:', error);
+                showAlert('Google signup failed. Please try again.', 'danger');
             });
         }
-        
+
+        // Initialize Google Sign-Up
         window.onload = function() {
-            if ("{{ google_client_id }}" && "{{ google_client_id }}" !== "None" && "{{ google_client_id }}" !== "") {
+            const googleClientId = "{{ google_client_id }}";
+            if (googleClientId && googleClientId !== "None" && googleClientId !== "") {
                 try {
                     google.accounts.id.initialize({
-                        client_id: "{{ google_client_id }}",
+                        client_id: googleClientId,
                         callback: handleGoogleSignup,
                         auto_select: false,
                         cancel_on_tap_outside: false,
@@ -394,155 +337,83 @@
                     });
                     google.accounts.id.renderButton(
                         document.getElementById('googleSignupBtn'),
-                        { theme: 'outline', size: 'large', width: '100%' }
+                        { theme: 'outline', size: 'large', width: 280, shape: 'rectangular' }
                     );
                 } catch (error) {
-                    console.log('Google Sign-In not available:', error);
+                    console.warn('Google Sign-Up initialization error:', error);
                     document.getElementById('googleSignupBtn').style.display = 'none';
                 }
             } else {
-                document.getElementById('googleSignupBtn').style.display = 'none';
+                const btnContainer = document.getElementById('googleSignupBtn');
+                if (btnContainer) btnContainer.style.display = 'none';
             }
         };
-        // Password strength checker
-        document.getElementById('password').addEventListener('input', function() {
-            const password = this.value;
-            const strengthDiv = document.getElementById('passwordStrength');
-            const weak = strengthDiv.querySelector('.strength-weak');
-            const medium = strengthDiv.querySelector('.strength-medium');
-            const strong = strengthDiv.querySelector('.strength-strong');
 
-            if (password.length === 0) {
-                strengthDiv.style.display = 'none';
-                return;
-            }
-
-            strengthDiv.style.display = 'block';
-            weak.style.display = 'none';
-            medium.style.display = 'none';
-            strong.style.display = 'none';
-
-            if (password.length < 6) {
-                weak.style.display = 'block';
-            } else if (password.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-                medium.style.display = 'block';
-            } else {
-                strong.style.display = 'block';
-            }
-        });
-
-        // Password confirmation checker
-        document.getElementById('confirmPassword').addEventListener('input', function() {
-            const password = document.getElementById('password').value;
-            const confirmPassword = this.value;
-            const feedback = document.getElementById('confirmPasswordFeedback');
-
-            if (confirmPassword && password !== confirmPassword) {
-                this.classList.add('is-invalid');
-                feedback.style.display = 'block';
-            } else {
-                this.classList.remove('is-invalid');
-                feedback.style.display = 'none';
-            }
-        });
-
+        // Signup Form Submission
         document.getElementById('signupForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            const termsChecked = document.getElementById('terms').checked;
 
             const signupBtn = document.getElementById('signupBtn');
             const btnText = signupBtn.querySelector('.btn-text');
             const loading = signupBtn.querySelector('.loading');
-            const colMd5 = document.querySelector('.col-md-5');
-            const card = document.querySelector('.card');
 
-            // Clear previous alerts
-            const existingAlerts = colMd5.querySelectorAll('.alert');
-            existingAlerts.forEach(alert => alert.remove());
-
-            // Client-side validation
+            // Client-side validations
             const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
             if (!emailPattern.test(email)) {
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
-                errorAlert.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>Please enter a valid email address
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-                colMd5.insertBefore(errorAlert, card);
+                showAlert('Please enter a valid email address.');
+                document.getElementById('email').focus();
                 return;
             }
 
             if (password.length < 6) {
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
-                errorAlert.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>Password must be at least 6 characters long
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-                colMd5.insertBefore(errorAlert, card);
+                showAlert('Password must be at least 6 characters long.');
+                document.getElementById('password').focus();
                 return;
             }
 
             if (password !== confirmPassword) {
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
-                errorAlert.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>Passwords do not match
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-                colMd5.insertBefore(errorAlert, card);
+                showAlert('Passwords do not match.');
+                document.getElementById('confirmPassword').focus();
+                return;
+            }
+
+            if (!termsChecked) {
+                showAlert('Please agree to the Terms of Service and Privacy Policy.');
                 return;
             }
 
             // Show loading state
-            btnText.style.display = 'none';
-            loading.style.display = 'inline';
+            btnText.classList.add('d-none');
+            loading.classList.remove('d-none');
             signupBtn.disabled = true;
 
             try {
                 const response = await fetch('/auth/api/signup', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Signup successful, show success message
-                    const successAlert = document.createElement('div');
-                    successAlert.className = 'alert alert-success alert-dismissible fade show mt-3';
-                    successAlert.innerHTML = `
-                        <i class="fas fa-check-circle me-2"></i>${data.message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    `;
-                    colMd5.insertBefore(successAlert, card);
-
-                    // Redirect to login after a delay
-                    setTimeout(() => { window.location.href = '{{ url_for('auth.login') }}'; }, 2000);
+                    showAlert(data.message || 'Account created successfully! Redirecting to login...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '{{ url_for("auth.login") }}';
+                    }, 1800);
                 } else {
-                    throw new Error(data.error || 'An unexpected error occurred during signup.');
+                    showAlert(data.error || 'Failed to create account.');
                 }
-
             } catch (error) {
                 console.error('Signup error:', error);
-                // Show error message
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
-                errorAlert.innerHTML = `
-                    <i class="fas fa-exclamation-triangle me-2"></i>${error.message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-                colMd5.insertBefore(errorAlert, card);
+                showAlert('A network error occurred during signup. Please try again.');
             } finally {
-                // Hide loading state
-                btnText.style.display = 'inline';
-                loading.style.display = 'none';
+                btnText.classList.remove('d-none');
+                loading.classList.add('d-none');
                 signupBtn.disabled = false;
             }
         });

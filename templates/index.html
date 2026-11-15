@@ -3,376 +3,900 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legal Document Generator</title>
+    <title>Legal Document Generator - Professional Indian Legal Drafting</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Style System -->
+    <link href="{{ url_for('static', filename='css/style.css') }}?v=2.2" rel="stylesheet">
+    <!-- Animation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <style>
-        #three-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        }
-        .hero-section {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            background: transparent;
-        }
-        .hero-content {
-            text-align: center;
-            color: var(--text-primary);
-            opacity: 0;
-            transform: translateY(50px);
-        }
-        .hero-title {
-            font-size: 4rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1.5rem;
-        }
-        .hero-subtitle {
-            font-size: 1.5rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-        }
-        .scroll-indicator {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: bounce 2s infinite;
-        }
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-            40% { transform: translateX(-50%) translateY(-10px); }
-            60% { transform: translateX(-50%) translateY(-5px); }
-        }
-        .animated-card {
-            opacity: 0;
-            transform: translateY(50px) scale(0.9);
-        }
-        .animated-text {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        .floating-shapes {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: -1;
-        }
-        .shape {
-            position: absolute;
-            opacity: 0.1;
-            animation: float 6s ease-in-out infinite;
-        }
-        .shape:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
-        .shape:nth-child(2) { top: 20%; right: 10%; animation-delay: 2s; }
-        .shape:nth-child(3) { bottom: 10%; left: 20%; animation-delay: 4s; }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-    </style>
 </head>
 <body>
-    <canvas id="three-canvas"></canvas>
-    
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="floating-shapes">
-            <div class="shape"><i class="fas fa-gavel fa-3x"></i></div>
-            <div class="shape"><i class="fas fa-file-contract fa-3x"></i></div>
-            <div class="shape"><i class="fas fa-balance-scale fa-3x"></i></div>
-        </div>
-        <div class="hero-content">
-            <h1 class="hero-title">Legal Document Generator</h1>
-            <p class="hero-subtitle">Professional. Secure. Efficient.</p>
-            <div class="d-flex gap-3 justify-content-center">
-                {% if not user %}
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
-                        <i class="fas fa-sign-in-alt me-2"></i>Get Started
-                    </a>
-                    <a href="{{ url_for('auth.signup') }}" class="btn btn-outline-primary btn-lg">
-                        <i class="fas fa-user-plus me-2"></i>Sign Up
-                    </a>
-                {% else %}
-                    <a href="#main-content" class="btn btn-primary btn-lg">
-                        <i class="fas fa-file-alt me-2"></i>Create Document
-                    </a>
-                {% endif %}
+
+    <!-- Generation Loading Overlay -->
+    <div class="generation-overlay" id="generationOverlay">
+        <div class="generation-dialog">
+            <div class="generation-spinner-wrapper">
+                <div class="generation-spinner"></div>
+                <div class="generation-spinner-icon">
+                    <i class="fas fa-gavel"></i>
+                </div>
             </div>
+            <h4 class="fw-bold text-dark mb-2">Drafting Legal Document</h4>
+            <p class="text-secondary small mb-3">Our NLP engine is classifying document structure, mapping parties, and applying statutory clauses...</p>
+            <div class="progress mb-2" style="height: 6px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 100%"></div>
+            </div>
+            <span class="text-muted" style="font-size: 0.775rem;"><i class="fas fa-lock me-1"></i> Processing securely</span>
         </div>
-        <div class="scroll-indicator">
-            <i class="fas fa-chevron-down fa-2x text-muted"></i>
-        </div>
-    </section>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" style="background: rgba(74, 85, 104, 0.95) !important; backdrop-filter: blur(20px);">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="fas fa-gavel me-2"></i>Legal Document Generator
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg custom-navbar fixed-top" id="mainNav">
+        <div class="container-fluid px-3 px-lg-4 px-xl-5">
+            <a class="navbar-brand navbar-brand-custom" href="{{ url_for('main.index') }}">
+                <span class="brand-icon-wrapper">
+                    <i class="fas fa-gavel"></i>
+                </span>
+                <span>Legal Document Generator</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars text-dark fs-5"></i>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    {% if user %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.index') }}"><i class="fas fa-home"></i> Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.user_history') }}"><i class="fas fa-history"></i> History</a>
-                        </li>
-                    {% endif %}
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="#generate">Create Document</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="#document-types">Document Types</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="#how-it-works">How It Works</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="#about">About</a>
+                    </li>
                 </ul>
-                <ul class="navbar-nav ms-auto">
+
+                <div class="d-flex align-items-center gap-2 flex-nowrap">
                     {% if user %}
-                        <li class="nav-item">
-                            <span class="navbar-text me-3"><i class="fas fa-user-circle"></i> Welcome, {{ user.username }}!</span>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        </li>
+                        <a href="{{ url_for('main.user_history') }}" class="btn-nav-history">
+                            <i class="fas fa-clock-rotate-left"></i>
+                            <span>History</span>
+                        </a>
+
+                        <div class="dropdown user-dropdown">
+                            <button class="user-profile-chip dropdown-toggle" type="button" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="user-avatar-circle">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <span class="user-name-text">{{ user.username }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end user-dropdown-panel shadow-sm" aria-labelledby="userMenuBtn">
+                                <li class="dropdown-header">
+                                    <span class="d-block text-muted small">Signed in as</span>
+                                    <strong class="text-dark">{{ user.username }}</strong>
+                                    {% if user.email %}
+                                        <span class="d-block text-muted small text-truncate" style="max-width: 200px;">{{ user.email }}</span>
+                                    {% endif %}
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('main.user_history') }}">
+                                        <i class="fas fa-clock-rotate-left me-2 text-primary"></i> My Documents
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#generate">
+                                        <i class="fas fa-wand-magic-sparkles me-2 text-primary"></i> Draft Document
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                                        <i class="fas fa-arrow-right-from-bracket me-2"></i> Log Out
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <a href="{{ url_for('auth.logout') }}" class="btn-nav-logout" title="Log Out">
+                            <i class="fas fa-arrow-right-from-bracket"></i>
+                            <span class="d-none d-sm-inline">Logout</span>
+                        </a>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.login') }}"><i class="fas fa-sign-in-alt"></i> Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.signup') }}"><i class="fas fa-user-plus"></i> Sign Up</a>
-                        </li>
+                        <a href="{{ url_for('auth.login') }}" class="btn-nav-login">
+                            <i class="fas fa-arrow-right-to-bracket"></i>
+                            <span>Login</span>
+                        </a>
+                        <a href="{{ url_for('auth.signup') }}" class="btn-nav-signup">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Sign Up</span>
+                        </a>
                     {% endif %}
-                </ul>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content Section -->
-    <section id="main-content" class="py-5" style="margin-top: 100vh;">
-        <div class="container">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-info alert-dismissible fade show animated-text" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+    <!-- Hero Section -->
+    <section class="hero-wrapper" id="home">
+        <!-- Subtle Three.js Interactive Ambient Canvas -->
+        <canvas id="hero-canvas"></canvas>
 
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="card animated-card">
-                        <div class="card-header">
-                            <h4 class="mb-0 animated-text"><i class="fas fa-file-alt me-2"></i>Generate Legal Document</h4>
-                        </div>
-                        <div class="card-body">
-                            <p class="text-muted mb-3 animated-text">Describe the legal document you want to generate in natural language. Include details like parties involved, amounts, dates, and locations.</p>
-                            <form method="POST" action="{{ url_for('document.generate_from_prompt') }}">
-                                <div class="mb-3 d-flex align-items-center animated-text">
-                                    <label for="prompt" class="form-label me-3 mb-0 flex-shrink-0">Document Description</label>
-                                    <textarea class="form-control" id="prompt" name="prompt" rows="4" placeholder="Example: Create a rental agreement between John Smith (landlord) and Jane Doe (tenant) for a property at 123 Main Street, Mumbai for Rs. 25,000 per month starting from January 1, 2024 for 12 months." required></textarea>
-                                    <button type="button" id="voice-input-btn" class="btn btn-secondary voice-input-btn ms-3" title="Click to start/stop voice input">
-                                        <i class="fas fa-microphone"></i> Voice Input
-                                    </button>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-lg mt-3 animated-text">
-                                    <i class="fas fa-magic me-2"></i>Generate Document
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+        <div class="container hero-inner-container">
+            <div class="hero-center-content">
+                <!-- 1. Top Platform Badge -->
+                <div class="hero-badge mx-auto">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>AI-Powered Legal Drafting Platform for India</span>
                 </div>
-            </div>
 
-            <hr class="my-5 animated-text">
+                <!-- 2. Large Heading with Gradient Highlight Line -->
+                <h1 class="hero-title">
+                    <span>Your Legal Documents,</span>
+                    <span class="d-block hero-title-gradient">Simplified with Intelligence.</span>
+                </h1>
 
-            <h3 class="mb-4 text-center animated-text">Or Select Document Type</h3>
-            <div class="row" id="documentTypes">
-                <div class="col-md-6 mb-4">
-                    <div class="card animated-card document-type-card">
-                        <div class="card-body text-center">
-                            <div class="icon mb-3">
-                                <i class="fas fa-home"></i>
+                <!-- 3. Short Descriptive Subtitle -->
+                <p class="hero-subtitle">
+                    Create professional legal agreements and documents in minutes. Just describe your requirements, customize the details, and download your document with ease.
+                </p>
+
+                <!-- 4. Three Feature Highlights -->
+                <div class="hero-feature-pills">
+                    <span class="hero-pill">
+                        <i class="fas fa-language"></i>
+                        <span>10+ Indian Languages</span>
+                    </span>
+                    <span class="hero-pill">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <span>AI-Assisted Legal Drafting</span>
+                    </span>
+                    <span class="hero-pill">
+                        <i class="fas fa-file-export"></i>
+                        <span>PDF &amp; DOCX Export</span>
+                    </span>
+                </div>
+
+                <!-- 5. CTA Buttons -->
+                <div class="hero-cta-group">
+                    <a href="#generate" class="btn-premium btn-premium-primary btn-premium-lg">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <span>Get Started</span>
+                    </a>
+                    <a href="#document-types" class="btn-premium btn-premium-secondary btn-premium-lg">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Explore Document Types</span>
+                    </a>
+                </div>
+
+                <!-- 5. Centered 3x2 Image Gallery -->
+                <div class="hero-gallery-grid-container">
+                    <div class="hero-gallery-grid">
+                        <!-- Card 1: Gavel & Scales of Justice -->
+                        <div class="hero-grid-card">
+                            <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80" 
+                                 alt="Gavel and Scales of Justice" 
+                                 loading="lazy"
+                                 onerror="this.src='https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80'">
+                            <div class="hero-grid-overlay">
+                                <span class="hero-grid-badge"><i class="fas fa-gavel me-1"></i> Judicial Standards</span>
+                                <p class="hero-grid-title">Gavel & Scales of Justice</p>
+                                <p class="hero-grid-desc">Court-compliant statutory clauses</p>
                             </div>
-                            <h5 class="card-title">Rental Agreement</h5>
-                            <p class="card-text">Generate a standard rental agreement with customizable terms.</p>
-                            <a href="{{ url_for('document.document_form', doc_type='rental_agreement') }}" class="btn btn-outline-primary">Generate</a>
+                        </div>
+
+                        <!-- Card 2: Contract Signing -->
+                        <div class="hero-grid-card">
+                            <img src="https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=600&q=80" 
+                                 alt="Contract Signing with Fountain Pen" 
+                                 loading="lazy"
+                                 onerror="this.src='https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=600&q=80'">
+                            <div class="hero-grid-overlay">
+                                <span class="hero-grid-badge"><i class="fas fa-pen-fancy me-1"></i> Legal Execution</span>
+                                <p class="hero-grid-title">Contract Signing</p>
+                                <p class="hero-grid-desc">Binding party attestations & covenants</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Legal Professional at Work -->
+                        <div class="hero-grid-card">
+                            <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=600&q=80" 
+                                 alt="Legal Professional Collaboration" 
+                                 loading="lazy"
+                                 onerror="this.src='https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=600&q=80'">
+                            <div class="hero-grid-overlay">
+                                <span class="hero-grid-badge"><i class="fas fa-user-tie me-1"></i> Consultation</span>
+                                <p class="hero-grid-title">Legal Professional at Work</p>
+                                <p class="hero-grid-desc">Structured drafting expertise</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Digital Legal Documents -->
+                        <div class="hero-grid-card">
+                            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80" 
+                                 alt="Digital Legal Drafting on Laptop" 
+                                 loading="lazy"
+                                 onerror="this.src='https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80'">
+                            <div class="hero-grid-overlay">
+                                <span class="hero-grid-badge"><i class="fas fa-laptop-code me-1"></i> Digital Drafting</span>
+                                <p class="hero-grid-title">Digital Legal Documents</p>
+                                <p class="hero-grid-desc">Instant Word (.docx) & PDF creation</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 5: Power of Attorney -->
+                        <div class="hero-grid-card">
+                            <img src="https://images.unsplash.com/photo-1505664194779-8beaceb93744?auto=format&fit=crop&w=600&q=80" 
+                                 alt="Scales of Justice and Representation Authority" 
+                                 loading="lazy"
+                                 onerror="this.src='https://images.unsplash.com/photo-1505664194779-8beaceb93744?auto=format&fit=crop&w=600&q=80'">
+                            <div class="hero-grid-overlay">
+                                <span class="hero-grid-badge"><i class="fas fa-scale-balanced me-1"></i> Legal Authority</span>
+                                <p class="hero-grid-title">Power of Attorney</p>
+                                <p class="hero-grid-desc">Authorized representation powers</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 6: Land Sale Deed Records -->
+                        <div class="hero-grid-card">
+                            <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80" 
+                                 alt="Financial and Land Conveyance Records" 
+                                 loading="lazy"
+                                 onerror="this.src='https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80'">
+                            <div class="hero-grid-overlay">
+                                <span class="hero-grid-badge"><i class="fas fa-landmark me-1"></i> Conveyance</span>
+                                <p class="hero-grid-title">Land Sale Deed Records</p>
+                                <p class="hero-grid-desc">Boundaries, survey & registry</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 mb-4">
-                    <div class="card animated-card document-type-card">
-                        <div class="card-body text-center">
-                            <div class="icon mb-3">
-                                <i class="fas fa-map-marked-alt"></i>
-                            </div>
-                            <h5 class="card-title">Land Sale Deed</h5>
-                            <p class="card-text">Create a land sale deed with property and party details.</p>
-                            <a href="{{ url_for('document.document_form', doc_type='land_sale_deed') }}" class="btn btn-outline-primary">Generate</a>
-                        </div>
+
+                <!-- 6. Project Statistics -->
+                <div class="hero-metrics">
+                    <div class="metric-item">
+                        <h4>10+</h4>
+                        <span>Indian Languages</span>
                     </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="card animated-card document-type-card">
-                        <div class="card-body text-center">
-                            <div class="icon mb-3">
-                                <i class="fas fa-user-tie"></i>
-                            </div>
-                            <h5 class="card-title">Power of Attorney</h5>
-                            <p class="card-text">Draft a power of attorney document with customizable authority scope.</p>
-                            <a href="{{ url_for('document.document_form', doc_type='power_of_attorney') }}" class="btn btn-outline-primary">Generate</a>
-                        </div>
+                    <div class="metric-item">
+                        <h4>4</h4>
+                        <span>Core Legal Deeds</span>
                     </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="card animated-card document-type-card">
-                        <div class="card-body text-center">
-                            <div class="icon mb-3">
-                                <i class="fas fa-building"></i>
-                            </div>
-                            <h5 class="card-title">House Lease</h5>
-                            <p class="card-text">Generate a house lease agreement with detailed terms.</p>
-                            <a href="{{ url_for('document.document_form', doc_type='house_lease') }}" class="btn btn-outline-primary">Generate</a>
-                        </div>
+                    <div class="metric-item">
+                        <h4>100%</h4>
+                        <span>Court-Standard Drafts</span>
+                    </div>
+                    <div class="metric-item">
+                        <h4>PDF & DOCX</h4>
+                        <span>Direct Export</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Natural Language Document Generation Section -->
+    <section class="py-5" id="generate">
+        <div class="container py-4">
+            <div class="section-header">
+                <span class="section-tag">AI-Assisted Generation</span>
+                <h2 class="section-title">Create Your Legal Document</h2>
+                <p class="section-subtitle">
+                    Describe your legal requirements in natural language. Mention parties, locations, amounts, and dates. Our engine will classify the document type and draft it instantly.
+                </p>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-9 col-xl-8">
+                    <!-- Flashed Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category in ['error', 'danger'] else 'success' }} alert-dismissible fade show custom-alert shadow-sm" role="alert">
+                                    <i class="fas fa-{{ 'circle-exclamation' if category in ['error', 'danger'] else 'circle-check' }} fs-5"></i>
+                                    <div>{{ message }}</div>
+                                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="generate-card">
+                        <!-- Quick Prompt Starter Chips -->
+                        <div class="prompt-quick-tags">
+                            <span class="quick-tag-label"><i class="fas fa-bolt text-warning me-1"></i> Quick Examples:</span>
+                            <button type="button" class="quick-tag-btn" onclick="populatePrompt('rental')">
+                                <i class="fas fa-home me-1"></i> Rental Agreement
+                            </button>
+                            <button type="button" class="quick-tag-btn" onclick="populatePrompt('lease')">
+                                <i class="fas fa-building me-1"></i> 2-Year House Lease
+                            </button>
+                            <button type="button" class="quick-tag-btn" onclick="populatePrompt('land')">
+                                <i class="fas fa-landmark me-1"></i> Land Sale Deed
+                            </button>
+                            <button type="button" class="quick-tag-btn" onclick="populatePrompt('poa')">
+                                <i class="fas fa-file-signature me-1"></i> Power of Attorney
+                            </button>
+                        </div>
+
+                        <!-- Generation Form -->
+                        <form method="POST" action="{{ url_for('document.generate_from_prompt') }}" id="promptForm">
+                            <div class="prompt-textarea-wrapper">
+                                <label for="prompt" class="form-label fw-semibold text-dark d-flex justify-content-between align-items-center mb-2">
+                                    <span>Describe Legal Requirements</span>
+                                    <button type="button" class="btn-clear-prompt" id="clearPromptBtn" title="Clear input text">
+                                        <i class="fas fa-rotate-left"></i> Reset
+                                    </button>
+                                </label>
+                                
+                                <textarea 
+                                    class="prompt-textarea" 
+                                    id="prompt" 
+                                    name="prompt" 
+                                    rows="5" 
+                                    placeholder="Example: Create a rental agreement between Rahul Sharma (landlord) and Priya Patel (tenant) for a 2BHK flat at 402, Sunshine Apartments, Koramangala, Bengaluru for Rs. 28,000 per month with Rs. 1,00,000 security deposit for 11 months starting from April 1, 2024..."
+                                    required
+                                    maxlength="3000"></textarea>
+                                
+                                <div class="invalid-feedback d-none" id="promptValidationFeedback">
+                                    Please enter at least 15 characters describing the document details.
+                                </div>
+                            </div>
+
+                            <div class="prompt-actions-bar">
+                                <div class="d-flex align-items-center gap-2">
+                                    <!-- Voice Input Button -->
+                                    <button type="button" id="voice-input-btn" class="btn-voice" title="Click to dictate requirements">
+                                        <i class="fas fa-microphone"></i>
+                                        <span>Voice Input</span>
+                                    </button>
+                                    <span class="text-muted small d-none d-sm-inline">Dictate naturally</span>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3">
+                                    <!-- Character Counter -->
+                                    <span class="char-counter" id="charCounter">0 / 3,000 characters</span>
+
+                                    <!-- Submit Button -->
+                                    <button type="submit" class="btn-premium btn-premium-primary" id="generateDocBtn">
+                                        <i class="fas fa-wand-magic-sparkles"></i>
+                                        <span>Generate Document</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Security note -->
+                    <div class="d-flex align-items-center justify-content-center gap-3 mt-3 text-muted small text-center">
+                        <span><i class="fas fa-lock text-primary me-1"></i> Data processed securely</span>
+                        <span>•</span>
+                        <span><i class="fas fa-language text-primary me-1"></i> English & 10 Indian Languages</span>
+                        <span>•</span>
+                        <span><i class="fas fa-file-pdf text-primary me-1"></i> Print & Word Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Document Types Section -->
+    <section class="py-5 bg-white border-top border-bottom" id="document-types">
+        <div class="container py-4">
+            <div class="section-header">
+                <span class="section-tag">Structured Templates</span>
+                <h2 class="section-title">Explore Document Types</h2>
+                <p class="section-subtitle">
+                    Prefer filling out a guided questionnaire? Select from our specialized Indian legal document templates below.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Rental Agreement -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="doc-type-card">
+                        <div>
+                            <div class="doc-type-icon">
+                                <i class="fas fa-house-chimney"></i>
+                            </div>
+                            <h5>Rental Agreement</h5>
+                            <p>Standard 11-month residential tenancy agreement with rent, security deposit, maintenance, and renewal terms.</p>
+                        </div>
+                        <a href="{{ url_for('document.document_form', doc_type='rental_agreement') }}" class="btn-premium btn-premium-secondary w-100">
+                            <span>Generate Document</span>
+                            <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Land Sale Deed -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="doc-type-card">
+                        <div>
+                            <div class="doc-type-icon">
+                                <i class="fas fa-map-location-dot"></i>
+                            </div>
+                            <h5>Land Sale Deed</h5>
+                            <p>Conveyance deed for immovable land transfers with survey numbers, clear boundaries, consideration, and witnesses.</p>
+                        </div>
+                        <a href="{{ url_for('document.document_form', doc_type='land_sale_deed') }}" class="btn-premium btn-premium-secondary w-100">
+                            <span>Generate Document</span>
+                            <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Power of Attorney -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="doc-type-card">
+                        <div>
+                            <div class="doc-type-icon">
+                                <i class="fas fa-file-signature"></i>
+                            </div>
+                            <h5>Power of Attorney</h5>
+                            <p>Authorize a trusted attorney or agent to handle property management, banking, registration, and legal affairs.</p>
+                        </div>
+                        <a href="{{ url_for('document.document_form', doc_type='power_of_attorney') }}" class="btn-premium btn-premium-secondary w-100">
+                            <span>Generate Document</span>
+                            <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- House Lease -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="doc-type-card">
+                        <div>
+                            <div class="doc-type-icon">
+                                <i class="fas fa-building-user"></i>
+                            </div>
+                            <h5>House Lease</h5>
+                            <p>Multi-year residential or commercial lease deed with comprehensive covenants, dispute resolution, and covenants.</p>
+                        </div>
+                        <a href="{{ url_for('document.document_form', doc_type='house_lease') }}" class="btn-premium btn-premium-secondary w-100">
+                            <span>Generate Document</span>
+                            <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-5" id="how-it-works">
+        <div class="container py-4">
+            <div class="section-header">
+                <span class="section-tag">Simple Process</span>
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">
+                    Generate legally structured documents in three effortless steps without complicated legal software.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="step-card">
+                        <div class="step-number-badge">1</div>
+                        <h5 class="fw-bold text-dark mb-2">Describe Requirements</h5>
+                        <p class="text-secondary small mb-0">
+                            Type in simple conversational language or use voice dictation. Specify names, addresses, sums, and terms.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="step-card">
+                        <div class="step-number-badge">2</div>
+                        <h5 class="fw-bold text-dark mb-2">Generate & Review</h5>
+                        <p class="text-secondary small mb-0">
+                            Our NLP system extracts legal entities, classifies deed categories, and compiles standardized statutory clauses.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="step-card">
+                        <div class="step-number-badge">3</div>
+                        <h5 class="fw-bold text-dark mb-2">Download Document</h5>
+                        <p class="text-secondary small mb-0">
+                            Review extracted details, make live edits, and export directly in court-ready PDF, Word (.docx), or plain text.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5 bg-white border-top" id="features">
+        <div class="container py-4">
+            <div class="section-header">
+                <span class="section-tag">Platform Highlights</span>
+                <h2 class="section-title">Designed for Modern Indian Legal Needs</h2>
+                <p class="section-subtitle">
+                    State-of-the-art tools and language support to make legal drafting accessible, reliable, and swift.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">AI-Assisted Document Generation</h5>
+                        <p class="text-secondary small mb-0">
+                            SpaCy entity recognition extracts key names, locations, and clauses automatically to populate standard formats.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Natural Language Input</h5>
+                        <p class="text-secondary small mb-0">
+                            No legal expertise required. Describe your arrangement just as you would explain it to a trusted drafting counsel.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <i class="fas fa-microphone-lines"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Voice Input Integration</h5>
+                        <p class="text-secondary small mb-0">
+                            Dictate clauses and details hands-free via integrated Web Speech recognition directly inside your web browser.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <i class="fas fa-language"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Multiple Indian Languages</h5>
+                        <p class="text-secondary small mb-0">
+                            Generate agreements in Hindi, Bengali, Telugu, Marathi, Tamil, Urdu, Gujarati, Kannada, and Odia.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <i class="fas fa-file-export"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">PDF, DOCX & TXT Downloads</h5>
+                        <p class="text-secondary small mb-0">
+                            Clean A4 ReportLab PDF documents with standard margins, or Microsoft Word DOCX for further lawyer customization.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <i class="fas fa-shield-cat"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Secure Document History</h5>
+                        <p class="text-secondary small mb-0">
+                            Registered users receive encrypted Supabase cloud storage to revisit, edit, and re-download past deeds anytime.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="py-5" id="about">
+        <div class="container py-4">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="section-tag">About The Project</span>
+                    <h2 class="section-title">Bridging Legal Literacy with Technology</h2>
+                    <p class="text-secondary mb-3">
+                        Legal Document Generator was created to democratize access to standardized legal documentation in India. Navigating lease agreements, land deeds, and powers of attorney often involves unnecessary complexity and delays.
+                    </p>
+                    <p class="text-secondary mb-4">
+                        By combining natural language processing with verified statutory drafting templates, we empower individuals, landlords, tenants, and small enterprises to draft legally cogent preliminary documents with clarity.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="#generate" class="btn-premium btn-premium-primary">
+                            <span>Start Drafting Now</span>
+                            <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                        <a href="{{ url_for('auth.signup') }}" class="btn-premium btn-premium-secondary">
+                            <span>Create Free Account</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="bg-white p-4 p-md-5 rounded-3 border shadow-sm">
+                        <h5 class="fw-bold text-dark mb-3"><i class="fas fa-circle-info text-primary me-2"></i>Our Commitments</h5>
+                        <ul class="list-unstyled text-secondary small d-flex flex-column gap-3 mb-0">
+                            <li class="d-flex align-items-start gap-2">
+                                <i class="fas fa-check text-success mt-1"></i>
+                                <span><strong>Court Alignment:</strong> Standardized Indian phrasing for jurisdiction, stamp duty, and witness attestations.</span>
+                            </li>
+                            <li class="d-flex align-items-start gap-2">
+                                <i class="fas fa-check text-success mt-1"></i>
+                                <span><strong>Multilingual Accessibility:</strong> Empowering citizens to read and generate deeds in their regional mother tongues.</span>
+                            </li>
+                            <li class="d-flex align-items-start gap-2">
+                                <i class="fas fa-check text-success mt-1"></i>
+                                <span><strong>Data Privacy:</strong> No document contents sold or shared with third-party advertisers.</span>
+                            </li>
+                            <li class="d-flex align-items-start gap-2">
+                                <i class="fas fa-check text-success mt-1"></i>
+                                <span><strong>Seamless Export:</strong> Clean typesetting matching standard judicial paper margins.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-wrapper">
+        <div class="container">
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4">
+                    <div class="footer-brand">
+                        <div class="brand-icon-wrapper" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                        <span>Legal Document Generator</span>
+                    </div>
+                    <p class="small text-slate-400 mb-3" style="color: #94a3b8; max-width: 340px;">
+                        Professional, secure, and accessible legal drafting platform for individuals, property owners, and businesses across India.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-secondary-subtle text-secondary small">India</span>
+                        <span class="badge bg-secondary-subtle text-secondary small">Flask & Python</span>
+                        <span class="badge bg-secondary-subtle text-secondary small">Supabase</span>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-2">
+                    <h6 class="text-white fw-bold mb-3">Navigation</h6>
+                    <a href="#home" class="footer-link">Home</a>
+                    <a href="#generate" class="footer-link">Create Document</a>
+                    <a href="#document-types" class="footer-link">Document Types</a>
+                    <a href="#how-it-works" class="footer-link">How It Works</a>
+                    <a href="#features" class="footer-link">Features</a>
+                    <a href="#about" class="footer-link">About</a>
+                </div>
+
+                <div class="col-sm-6 col-lg-3">
+                    <h6 class="text-white fw-bold mb-3">Document Types</h6>
+                    <a href="{{ url_for('document.document_form', doc_type='rental_agreement') }}" class="footer-link">Rental Agreement</a>
+                    <a href="{{ url_for('document.document_form', doc_type='land_sale_deed') }}" class="footer-link">Land Sale Deed</a>
+                    <a href="{{ url_for('document.document_form', doc_type='power_of_attorney') }}" class="footer-link">Power of Attorney</a>
+                    <a href="{{ url_for('document.document_form', doc_type='house_lease') }}" class="footer-link">House Lease</a>
+                </div>
+
+                <div class="col-lg-3">
+                    <h6 class="text-white fw-bold mb-3">Account & Access</h6>
+                    {% if user %}
+                        <a href="{{ url_for('main.user_history') }}" class="footer-link">My Document History</a>
+                        <a href="{{ url_for('auth.logout') }}" class="footer-link">Sign Out</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="footer-link">Sign In to Account</a>
+                        <a href="{{ url_for('auth.signup') }}" class="footer-link">Create Free Account</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Disclaimer Box -->
+            <div class="footer-disclaimer-box">
+                <div class="d-flex align-items-center gap-2 mb-1 text-white fw-semibold small">
+                    <i class="fas fa-shield-halved text-warning"></i> Legal Disclaimer
+                </div>
+                <span>
+                    Generated documents are intended as drafting assistance and preliminary templates. They should be reviewed by a qualified legal professional, advocate, or notary before execution, stamping, or registration under applicable state stamp and registration laws.
+                </span>
+            </div>
+
+            <div class="border-top border-secondary pt-3 mt-4 text-center small" style="color: #64748b; border-color: rgba(255,255,255,0.08) !important;">
+                &copy; 2026 Legal Document Generator. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/voice_input.js') }}"></script>
+
     <script>
-        // Three.js Scene for Main Page
-        let scene, camera, renderer, particles;
-        
-        function initThreeJS() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            
-            // Create subtle particles
-            const geometry = new THREE.BufferGeometry();
-            const particleCount = 50;
-            const positions = new Float32Array(particleCount * 3);
-            
-            for (let i = 0; i < particleCount * 3; i++) {
-                positions[i] = (Math.random() - 0.5) * 30;
+        // Sample Prompt Presets
+        const samplePrompts = {
+            rental: "Create an 11-month rental agreement between Rahul Sharma (owner, age 45, residing at No. 12, MG Road, Bengaluru) and Priya Patel (tenant, age 29, residing at 45 Residency Road, Bengaluru) for flat 402, Sunshine Apartments, Koramangala, Bengaluru - 560034. Monthly rent is Rs. 32,000 payable on 1st of every month with Rs. 1,00,000 refundable security deposit. Agreement starting from April 1, 2024 with 2 months notice period.",
+            lease: "Draft a 2-year house lease agreement between Suresh Kumar (lessor) and Anand Verma (lessee) for residential house at Plot 88, Anna Nagar West, Chennai - 600040. Lease rent is Rs. 40,000 per month, security deposit of Rs. 2,00,000, 3 months notice period, starting from May 1, 2024.",
+            land: "Create a land sale deed between Rajesh Gupta (seller, residing at 12 Civil Lines, Jaipur) and Vikram Singh (buyer, residing at 34 Vaishali Nagar, Jaipur) for residential plot measuring 2,400 sq ft, Survey Number 452/12, located at Sector 4, Mansarovar, Jaipur. Total sale consideration is Rs. 65,00,000 paid via bank transfer.",
+            poa: "Draft a General Power of Attorney from Arvind Menon (Principal, residing at Indiranagar, Bengaluru) appointing his brother Deepak Menon (Attorney, residing at Jayanagar, Bengaluru) to manage, lease, collect rent, and represent property matters for commercial premises at Commercial Street, Bengaluru for a period of one year starting from April 1, 2024."
+        };
+
+        function populatePrompt(type) {
+            const textarea = document.getElementById('prompt');
+            if (samplePrompts[type]) {
+                textarea.value = samplePrompts[type];
+                updateCharCounter();
+                textarea.focus();
+                // Smooth scroll to textarea
+                textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            
-            const material = new THREE.PointsMaterial({
-                color: 0x4a5568,
-                size: 0.02,
-                transparent: true,
-                opacity: 0.3
-            });
-            
-            particles = new THREE.Points(geometry, material);
-            scene.add(particles);
-            
-            camera.position.z = 5;
-            animate();
         }
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            particles.rotation.x += 0.0005;
-            particles.rotation.y += 0.001;
-            renderer.render(scene, camera);
+
+        // Character counter
+        function updateCharCounter() {
+            const textarea = document.getElementById('prompt');
+            const counter = document.getElementById('charCounter');
+            const len = textarea.value.length;
+            counter.textContent = `${len.toLocaleString()} / 3,000 characters`;
         }
-        
-        // GSAP Animations
-        function initAnimations() {
-            gsap.registerPlugin(ScrollTrigger);
-            
-            // Hero section animation
-            gsap.to('.hero-content', {
-                opacity: 1,
-                y: 0,
-                duration: 1.5,
-                ease: 'power2.out',
-                delay: 0.5
-            });
-            
-            // Scroll-triggered animations for cards
-            gsap.utils.toArray('.animated-card').forEach((card, index) => {
-                gsap.to(card, {
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    duration: 0.8,
-                    delay: index * 0.1,
-                    ease: 'back.out(1.7)',
-                    scrollTrigger: {
-                        trigger: card,
-                        start: 'top 80%',
-                        toggleActions: 'play none none reverse'
-                    }
-                });
-            });
-            
-            // Scroll-triggered animations for text
-            gsap.utils.toArray('.animated-text').forEach((text, index) => {
-                gsap.to(text, {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.6,
-                    delay: index * 0.05,
-                    ease: 'power2.out',
-                    scrollTrigger: {
-                        trigger: text,
-                        start: 'top 85%',
-                        toggleActions: 'play none none reverse'
-                    }
-                });
-            });
-            
-            // Smooth scroll for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        gsap.to(window, {
-                            duration: 1.5,
-                            scrollTo: target,
-                            ease: 'power2.inOut'
-                        });
-                    }
-                });
-            });
-        }
-        
-        // Initialize everything
-        window.addEventListener('load', () => {
-            initThreeJS();
-            initAnimations();
+
+        document.getElementById('prompt').addEventListener('input', updateCharCounter);
+
+        // Clear prompt button
+        document.getElementById('clearPromptBtn').addEventListener('click', function() {
+            const textarea = document.getElementById('prompt');
+            textarea.value = '';
+            updateCharCounter();
+            textarea.focus();
         });
-        
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // Form submission with validation and loading indicator
+        document.getElementById('promptForm').addEventListener('submit', function(e) {
+            const textarea = document.getElementById('prompt');
+            const feedback = document.getElementById('promptValidationFeedback');
+            const trimmed = textarea.value.trim();
+
+            if (trimmed.length < 15) {
+                e.preventDefault();
+                textarea.classList.add('is-invalid');
+                feedback.classList.remove('d-none');
+                feedback.style.display = 'block';
+                textarea.focus();
+                return false;
+            }
+
+            textarea.classList.remove('is-invalid');
+            feedback.classList.add('d-none');
+            feedback.style.display = 'none';
+
+            // Show generation overlay
+            const overlay = document.getElementById('generationOverlay');
+            overlay.classList.add('active');
+            
+            const btn = document.getElementById('generateDocBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Drafting...';
+            return true;
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const nav = document.getElementById('mainNav');
+            if (window.scrollY > 40) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Three.js subtle ambient background (safely wrapped)
+        try {
+            (function initThreeBackground() {
+                if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    return;
+                }
+
+                const canvas = document.getElementById('hero-canvas');
+                if (!canvas || typeof THREE === 'undefined') return;
+
+                const parent = canvas.parentElement;
+                if (!parent || parent.clientWidth === 0 || parent.clientHeight === 0) return;
+
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+                const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+                
+                function resize() {
+                    if (!canvas.parentElement) return;
+                    const width = canvas.parentElement.clientWidth;
+                    const height = canvas.parentElement.clientHeight;
+                    if (width > 0 && height > 0) {
+                        renderer.setSize(width, height);
+                        camera.aspect = width / height;
+                        camera.updateProjectionMatrix();
+                    }
+                }
+                resize();
+                window.addEventListener('resize', resize);
+
+                // Subtle particle cloud in deep navy / indigo tone
+                const particleCount = 45;
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(particleCount * 3);
+                for (let i = 0; i < particleCount * 3; i += 3) {
+                    positions[i] = (Math.random() - 0.5) * 16;
+                    positions[i + 1] = (Math.random() - 0.5) * 10;
+                    positions[i + 2] = (Math.random() - 0.5) * 8;
+                }
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+                const material = new THREE.PointsMaterial({
+                    color: 0x3b82f6,
+                    size: 0.08,
+                    transparent: true,
+                    opacity: 0.35
+                });
+
+                const points = new THREE.Points(geometry, material);
+                scene.add(points);
+                camera.position.z = 7;
+
+                let reqId;
+                function animate() {
+                    reqId = requestAnimationFrame(animate);
+                    points.rotation.y += 0.0004;
+                    points.rotation.x += 0.0002;
+                    renderer.render(scene, camera);
+                }
+                animate();
+            })();
+        } catch (threeErr) {
+            console.warn('Three.js canvas ambient background disabled:', threeErr);
+        }
+
+        // GSAP Scroll Animations (Safe - Hero above-the-fold content is styled via pure CSS)
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+                gsap.registerPlugin(ScrollTrigger);
+
+                gsap.utils.toArray('.doc-type-card').forEach((card, i) => {
+                    gsap.from(card, {
+                        scrollTrigger: {
+                            trigger: card,
+                            start: 'top 88%',
+                            toggleActions: 'play none none none'
+                        },
+                        opacity: 0,
+                        y: 20,
+                        duration: 0.5,
+                        delay: i * 0.08,
+                        ease: 'power1.out'
+                    });
+                });
+            }
         });
     </script>
 </body>
